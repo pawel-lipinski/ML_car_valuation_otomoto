@@ -201,9 +201,10 @@ df_pred["district"]=df_pred["district"].astype("category")
 df_pred["drive"]=df_pred["drive"].astype("category")
 df_pred["registered"]=df_pred["registered"].astype("category")
 df_pred["car_type"]=df_pred["car_type"].astype("category")
-df_pred["Zawieszenie regulowane"]=df_pred["Zawieszenie regulowane"].astype("int")
 
 
+if st.button('zapisz df'):
+    df_pred.to_csv(index=False)
 
 model_lgbm = joblib.load('lgbr_model.pkl')
 prediction = model_lgbm.predict(df_pred)

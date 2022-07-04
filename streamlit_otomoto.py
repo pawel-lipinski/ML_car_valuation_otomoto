@@ -1,248 +1,45 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jul  11:40:29 2022
-
+Created on Sat Jun  4 11:40:29 2022
 @author: pawel lipinski
 """
 
 import streamlit as st
 import joblib
-import pickle
-from datetime import date
 import pandas as pd
-import os
 
+st.write("Wyceń swój samochód")
 
-st.set_page_config(layout="wide")
+col1, col2, col3 = st.columns(3)
 
-current_year = date.today().year
-
-
-st.title("Wyceń swój samochód")
-
-model_nested_values = {
-    'Abarth': ['500', '595'], 'Alfa Romeo': ['147', '156', '159', 'Brera', 'Giulia', 'Giulietta', 'GT', 'Mito', 'Stelvio', 'Tonale'], 'Aston Martin': ['DB9'], 'Audi': ['80', '100', 'A1', 'A2', 'A3', 'A4', 'A4 Allroad', 'A5', 'A6', 'A6 Allroad', 'A7', 'A8', 'Cabriolet', 'e-tron', 'e-tron GT', 'Q2', 'Q3', 'Q4', 'Q4 Sportback', 'Q5', 'Q7', 'Q8', 'R8', 'RS Q3', 'RS Q8', 'RS3', 'RS4', 'RS5', 'RS6', 'RS7', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'SQ5', 'SQ7', 'SQ8', 'TT', 'TT S'], 'BMW': ['3GT', '5GT', '6GT', 'i3', 'i8', 'Inny', 'iX', 'M2', 'M3', 'M4', 'M5', 'M6', 'M8', 'Seria 1', 'Seria 2', 'Seria 3', 'Seria 4', 'Seria 5', 'Seria 6', 'Seria 7', 'Seria 8', 'X1', 'X2', 'X3', 'X3 M', 'X4', 'X5', 'X5 M', 'X6', 'X6 M', 'X7', 'Z3', 'Z4'], 'BMW-ALPINA': ['B5'], 'Bentley': ['Continental Flying Spur', 'Continental GT'], 'Cadillac': ['CTS', 'Escalade', 'SRX'], 'Chevrolet': ['Aveo', 'Camaro', 'Captiva', 'Corvette', 'Cruze', 'Epica', 'Kalos', 'Lacetti', 'Malibu', 'Matiz', 'Nubira', 'Orlando', 'Silverado', 'Spark', 'Tahoe', 'Trailblazer', 'Trax'], 'Chrysler': ['200', '300C', '300s', 'Grand Voyager', 'Pacifica', 'PT Cruiser', 'Sebring', 'Stratus', 'Town & Country', 'Voyager'], 'Citroën': ['Berlingo', 'C1', 'C2', 'C3', 'C3 Aircross', 'C3 Picasso', 'C3 Pluriel', 'C4', 'C4 Aircross', 'C4 Cactus', 'C4 Grand Picasso', 'C4 Picasso', 'C4 SpaceTourer', 'C5', 'C5 Aircross', 'C5X', 'C6', 'C8', 'C-Crosser', 'C-ElysÃ©e', 'DS3', 'DS4', 'DS5', 'Jumper', 'Jumpy Combi', 'Nemo', 'Saxo', 'SpaceTourer', 'Xsara', 'Xsara Picasso'], 'Cupra': ['Ateca', 'Formentor'], 'DFSK': ['Seres 3'], 'DS Automobiles': ['DS 4', 'DS 4 Crossback', 'DS 5', 'DS 7 Crossback'], 'Dacia': ['Dokker', 'Duster', 'Jogger', 'Lodgy', 'Logan', 'Sandero', 'Sandero Stepway'], 'Daewoo': ['Kalos', 'Lanos', 'Matiz'], 'Daihatsu': ['Cuore', 'Materia', 'Sirion', 'Terios'], 'Dodge': ['Caliber', 'Challenger', 'Charger', 'Durango', 'Grand Caravan', 'Journey', 'Nitro', 'RAM'], 'Fiat': ['126', '500', '500L', '500X', 'Bravo', 'Cinquecento', 'Croma', 'Doblo', 'Ducato', 'Fiorino', 'Freemont', 'Grande Punto', 'Idea', 'Linea', 'Panda', 'Punto', 'Punto 2012', 'Punto Evo', 'Qubo', 'Scudo', 'Sedici', 'Seicento', 'Stilo', 'Talento', 'Tipo'], 'Ford': ['B-MAX', 'C-MAX', 'EcoSport', 'EDGE', 'Escape', 'Escort', 'Explorer', 'F150', 'Fiesta', 'Focus', 'Focus C-Max', 'Fusion', 'Galaxy', 'Grand C-MAX', 'KA', 'Ka+', 'Kuga', 'Maverick', 'Mondeo', 'Mustang', 'Mustang Mach-E', 'Puma', 'Ranger', 'Ranger Raptor', 'S-Max', 'Tourneo Connect', 'Tourneo Courier', 'Tourneo Custom', 'Transit', 'Transit Connect', 'Transit Courier', 'Transit Custom'], 'Honda': ['Accord', 'City', 'Civic', 'CR-V', 'CR-Z', 'e', 'FR-V', 'HR-V', 'Insight', 'Jazz', 'Legend', 'Odyssey'], 'Hummer': ['H2', 'H3'], 'Hyundai': ['Accent', 'Atos', 'Bayon', 'Coupe', 'Elantra', 'Galloper', 'Genesis', 'Genesis Coupe', 'Getz', 'i10', 'i20', 'I30', 'i30 N', 'i40', 'IONIQ', 'ix20', 'ix35', 'Kona', 'Matrix', 'Santa Fe', 'Sonata', 'Terracan', 'Tucson', 'Veloster'], 'Infiniti': ['FX', 'G', 'Q30', 'Q50', 'Q60', 'Q70', 'QX30', 'QX50', 'QX60', 'QX70'], 'Isuzu': ['D-Max'], 'Iveco': ['Daily'], 'Jaguar': ['E-Pace', 'F-Pace', 'F-Type', 'I-Pace', 'S-Type', 'XE', 'XF', 'XJ', 'XK', 'XK8', 'X-Type'], 'Jeep': ['Cherokee', 'Commander', 'Compass', 'Gladiator', 'Grand Cherokee', 'Liberty', 'Patriot', 'Renegade', 'Wrangler'], 'Kia': ['Carens', 'Carnival', 'Ceed', 'EV6', 'Magentis', 'Niro', 'Optima', 'Picanto', "Pro_cee'd", 'Rio', 'Sorento', 'Soul', 'Sportage', 'Stinger', 'Stonic', 'Venga', 'XCeed'], 'Lada': ['Niva'], 'Lancia': ['Delta', 'Musa', 'Phedra', 'Voyager', 'Ypsilon'], 'Land Rover': ['Defender', 'Discovery', 'Discovery Sport', 'Freelander', 'Range Rover', 'Range Rover Evoque', 'Range Rover Sport', 'Range Rover Velar'], 'Lexus': ['CT', 'ES', 'GS', 'IS', 'LC', 'LS', 'LX', 'NX', 'RC', 'RX', 'SC', 'UX'], 'Lincoln': ['Navigator', 'Town Car'], 'MINI': ['Clubman', 'Cooper', 'Cooper S', 'Countryman', 'John Cooper Works', 'ONE'], 'Maserati': ['Ghibli', 'GranTurismo', 'Levante', 'Quattroporte'], 'Mazda': ['2', '3', '5', '6', 'CX-3', 'CX-30', 'CX-5', 'CX-60', 'CX-7', 'CX-9', 'MX-5', 'RX-8'], 'Mercedes-Benz': ['AMG GT', 'Citan', 'CL', 'CLA', 'CLC', 'CLK', 'CLS', 'EQB', 'EQC', 'EQE', 'EQS', 'EQV', 'GL', 'GLA', 'GLB', 'GLC', 'GLE', 'GLK', 'GLS', 'Klasa A', 'Klasa B', 'Klasa C', 'Klasa E', 'Klasa G', 'Klasa R', 'Klasa S', 'Klasa T', 'Klasa V', 'Klasa X', 'ML', 'SL', 'SLK', 'Sprinter', 'Vaneo', 'Viano', 'Vito', 'W124 (1984-1993)', 'W201 (190)'], 'Mitsubishi': ['ASX', 'Carisma', 'Colt', 'Eclipse Cross', 'Grandis', 'L200', 'Lancer', 'Lancer Evolution', 'Outlander', 'Pajero', 'Pajero Pinin', 'Space Star'], 'Nissan': ['350 Z', '370 Z', 'Almera', 'Altima', 'GT-R', 'Juke', 'Leaf', 'Micra', 'Murano', 'Navara', 'Note', 'NV200', 'Pathfinder', 'Patrol', 'Pixo', 'Primera', 'Pulsar', 'Qashqai', 'Qashqai+2', 'Rogue', 'Terrano', 'Tiida', 'Townstar', 'X-Trail'], 'Opel': ['Adam', 'Agila', 'Ampera', 'Antara', 'Astra', 'Combo', 'Corsa', 'Crossland X', 'Frontera', 'Grandland X', 'Insignia', 'Karl', 'Meriva', 'Mokka', 'Movano', 'Omega', 'Signum', 'Tigra', 'Vectra', 'Vivaro', 'Zafira'], 'Peugeot': ['106', '107', '108', '206', '207', '207', '207', '207', '208', '208', '208', '208', '208', '301', '301', '301', '301', '307', '307', '307', '308', '308', '308', '308', '308', '308', '308', '308', '406', '406', '406', '407', '407', '407', '407', '407', '407', '407', '508', '508', '508', '508', '508', '508', '508', '607', '607', '607', '607', '807', '807', '807', '807', '1007', '1007', '1007', '1007', '1007', '1007', '2008', '2008', '2008', '2008', '2008', '2008', '2008', '2008', '2008', '2008', '2008', '3008', '3008', '3008', '3008', '3008', '4007', '5008', '206 CC', '206 CC', '206 CC', '206 CC', '206 CC', '206 CC', '206 plus', '206 plus', '206 plus', '207 CC', '207 CC', '207 CC', '207 CC', '207 CC', '307 CC', '307 CC', '307 CC', '307 CC', '307 CC', '307 CC', '308 CC', '308 CC', '308 CC', '308 CC', 'Bipper', 'Boxer', 'Expert', 'Partner', 'RCZ', 'Rifter', 'Traveller'], 'Polonez': ['Atu', 'Caro'], 'Porsche': ['911', '718 Boxster', '718 Cayman', 'Boxster', 'Cayenne', 'Cayman', 'Macan', 'Panamera', 'Taycan'], 'RAM': ['1500'], 'Renault': ['Arkana', 'Captur', 'Clio', 'Espace', 'Fluence', 'Grand Espace', 'Grand Scenic', 'Kadjar', 'Kangoo', 'Koleos', 'Laguna', 'Master', 'Megane', 'Modus', 'Scenic', 'Talisman', 'Thalia', 'Trafic', 'Twingo', 'Twizy', 'Vel Satis', 'Zoe'], 'Rover': ['75'], 'Saab': ['900', '9-3', '9-5'], 'Seat': ['Alhambra', 'Altea', 'Altea XL', 'Arona', 'Arosa', 'Ateca', 'Cordoba', 'Exeo', 'Ibiza', 'Leon', 'Mii', 'Tarraco', 'Toledo'], 'Smart': ['Forfour', 'Fortwo'], 'SsangYong': ['Korando', 'REXTON', 'Tivoli', 'Tivoli Grand'], 'Subaru': ['BRZ', 'Forester', 'Impreza', 'Justy', 'Legacy', 'Levorg', 'OUTBACK', 'WRX', 'XV'], 'Suzuki': ['Alto', 'Baleno', 'Grand Vitara', 'Ignis', 'Jimny', 'Kizashi', 'Liana', 'Samurai', 'Splash', 'Swace', 'Swift', 'SX4', 'SX4 S-Cross', 'Vitara', 'XL7'], 'Tesla': ['Model 3', 'Model S', 'Model X'], 'Toyota': ['4-Runner', 'Auris', 'Avensis', 'Aygo', 'Camry', 'Celica', 'C-HR', 'Corolla', 'Corolla Verso', 'GT86', 'Highlander', 'Hilux', 'iQ', 'Land Cruiser', 'Prius', 'Prius+', 'ProAce', 'Proace City Verso', 'Proace Verso', 'RAV4', 'Sienna', 'Tundra', 'Urban Cruiser', 'Verso', 'Verso S', 'Yaris', 'Yaris Verso'], 'Volkswagen': ['Amarok', 'Arteon', 'Atlas', 'Beetle', 'Bora', 'Caddy', 'California', 'Caravelle', 'CC', 'Crafter', 'Eos', 'Fox', 'Golf', 'Golf Plus', 'Golf Sportsvan', 'ID.3', 'ID.4', 'ID.5', 'Jetta', 'Lupo', 'Multivan', 'New Beetle', 'Passat', 'Passat CC', 'Phaeton', 'Polo', 'Scirocco', 'Sharan', 'Taigo', 'T-Cross', 'Tiguan', 'Tiguan Allspace', 'Touareg', 'Touran', 'Transporter', 'T-Roc', 'up!'], 'Volvo': ['C30', 'C70', 'S40', 'S60', 'S80', 'S90', 'V40', 'V50', 'V60', 'V70', 'V90', 'XC 40', 'XC 60', 'XC 70', 'XC 90'], 'Škoda': ['Citigo', 'Enyaq', 'Fabia', 'Felicia', 'Kamiq', 'Karoq', 'Kodiaq', 'Octavia', 'RAPID', 'Roomster', 'Scala', 'Superb', 'Yeti']}
-
-# =============================================================================
-#model_nested_values obtained via below script:
-#    
-#import pandas as pd
-# 
-# df=pd.read_csv("model_results.csv", usecols=["brand","model"])
-# 
-# df.drop_duplicates(inplace=True)
-# model_nested_values = df.groupby('brand')['model'].apply(list).to_dict()
-# 
-# print(model_nested_values)
-# 
-# =============================================================================
-
-col1, col2, col3, col4 = st.columns(4)
-
-fuel = col1.selectbox("Rodzaj paliwa:",['Benzyna','Benzyna+CNG',  'Benzyna+LPG', 'Diesel', 'Elektryczny','Hybryda', 'Wodór'])
-power = col2.number_input("Podaj moc w KM:", value=0, min_value=0, step=1)
-cylinder_capacity = col3.number_input("Pojemność skokowa w cm3:", value=0, min_value=0, step=1)
-transmission = col4.selectbox("Skrzynia biegów:", ['Automatyczna', 'Manualna'])
-mileage = col1.number_input("Podaj przebieg w km:", value=0, min_value=0, step=1)
-age = col2.number_input("Rok produkcji:", value=2022, min_value=0, step=1) #tranform into age
-brand = col3.selectbox("Marka samochodu:", ['Abarth',	'Alfa Romeo',	'Aston Martin',	'Audi',	'Bentley',	'BMW',	'BMW-ALPINA',	'Cadillac',	'Chevrolet',	'Chrysler',	'Citroën',	'Cupra',	'Dacia',	'Daewoo',	'Daihatsu',	'DFSK',	'Dodge',	'DS Automobiles',	'Fiat',	'Ford',	'Honda',	'Hummer',	'Hyundai',	'Infiniti',	'Isuzu',	'Iveco',	'Jaguar',	'Jeep',	'Kia',	'Lada',	'Lancia',	'Land Rover',	'Lexus',	'Lincoln',	'Maserati',	'Mazda',	'Mercedes-Benz',	'MINI',	'Mitsubishi',	'Nissan',	'Opel',	'Peugeot',	'Polonez',	'Porsche',	'RAM',	'Renault',	'Rover',	'Saab',	'Seat',	'Škoda',	'Smart',	'SsangYong',	'Subaru',	'Suzuki',	'Tesla',	'Toyota',	'Volkswagen',	'Volvo'])
-model = col4.selectbox("Model samochodu:", model_nested_values[brand] )
-no_crash = col1.selectbox("Bezwypadkowy:", ['Tak', 'Nie'])
-color = col2.selectbox("Kolor:", ['Beżowy', 'Biały', 'Bordowy', 'Brązowy', 'Czarny', 'Czerwony', 'Fioletowy', 'Inny kolor', 'Niebieski', 'Srebrny', 'Szary', 'Zielony', 'Złoty', 'Żółty'])
-
-colour_type_choices = {"matt":"Mat", "metallic":"Metalik", "pearl":"Perłowy"}
-
-def format_func_colour_type(colour_type):
-    return colour_type_choices[colour_type]
-
-colour_type = col3.selectbox("Rodzaj koloru:", options=list(colour_type_choices.keys()), format_func=format_func_colour_type)
-country = col4.selectbox("Kraj pochodzenia:",  ['Polska', 'Austria', 'Belgia', 'Białoruś', 'Bułgaria', 'Chorwacja', 'Czechy', 'Dania', 'Estonia', 'Finlandia', 'Francja', 'Grecja', 'Hiszpania', 'Holandia', 'Inny', 'Irlandia', 'Islandia', 'Japonia', 'Kanada', 'Liechtenstein', 'Litwa', 'Luksemburg', 'Łotwa', 'Monako', 'Niemcy', 'Norwegia', 'Rosja', 'Rumunia', 'Stany Zjednoczone', 'Szwajcaria', 'Szwecja', 'Słowacja', 'Słowenia', 'Turcja', 'Ukraina', 'Wielka Brytania', 'Węgry', 'Włochy'])
-doors = col1.selectbox("Liczba drzwi:", [2, 3, 4, 5, 6])
-seats = col2.selectbox("Liczba siedzeń:", [2, 3, 4, 5, 6, 7, 8, 9])
-
-condition = col3.selectbox("Stan:", ["Nowe", "Używane"])
-car_type = col4.selectbox("Typ samochodu:", ["Auta małe", "Auta miejsckie", "Coupe", "KAbriolet", "Kombi", "Kompakt", "Minivan", "Sedan", "SUV"])
-district = col1.selectbox("district", ['dolnoslaskie',	'kujawsko-pomorskie',	'lodzkie',	'lubelskie',	'lubuskie',	'malopolskie',	'mazowieckie',	'opolskie',	'podkarpackie',	'podlaskie',	'pomorskie',	'slaskie',	'swietokrzyskie',	'warminsko-mazurskie',	'wielkopolskie',	'zachodniopomorskie'])
-drive = col2.selectbox("Napęd:", ['4x4 (dołączany automatycznie)',	'4x4 (dołączany ręcznie)',	'4x4 (stały)',	'Na przednie koła',	'Na tylne koła'])
-registered = col3.selectbox("Zarejestrowany w Polsce:", ["Tak", "Nie"])
-
-col1, col2 = st.columns([4,1])
-
-col1.title("Podaj wyposażenie:")
-
-
-col1, col2, col3, col4 = st.columns(4)
-
-
-equipment_choices = {0: "Nie", 1: "Tak"}
-
-
-def format_func_equipment_zawieszenie(zawieszenie):
-    return equipment_choices[zawieszenie]
-zawieszenie = col1.selectbox("Zawieszenie regulowane:", options=list(equipment_choices.keys()), format_func=format_func_equipment_zawieszenie)
-
-def format_func_equipment_startstop(startstop):
-    return equipment_choices[startstop]
-startstop = col2.selectbox("System StartStop:", options=list(equipment_choices.keys()), format_func=format_func_equipment_startstop)
-
-def format_func_equipment_ogrzewane_siedzenie_tylne(ogrzewane_siedzenie_tylne):
-    return equipment_choices[ogrzewane_siedzenie_tylne]
-ogrzewane_siedzenie_tylne = col3.selectbox("Ogrzewane siedzenia tylne:", options=list(equipment_choices.keys()), format_func=format_func_equipment_ogrzewane_siedzenie_tylne)
-
-def format_func_equipment_klimatyzacja_4strefowa(klimatyzacja_4strefowa):
-    return equipment_choices[klimatyzacja_4strefowa]
-klimatyzacja_4strefowa = col4.selectbox("Klimatyzacja automatyczna 4 lub więcej strefowa:", options=list(equipment_choices.keys()), format_func=format_func_equipment_klimatyzacja_4strefowa)
-
-def format_func_equipment_kamera_parkowania(kamera_parkowania):
-    return equipment_choices[kamera_parkowania]
-kamera_parkowania = col1.selectbox("Kamera parkowania tył:", options=list(equipment_choices.keys()), format_func=format_func_equipment_kamera_parkowania)
-
-def format_func_equipment_ogrzewanie_postojowe(ogrzewanie_postojowe):
-    return equipment_choices[ogrzewanie_postojowe]
-ogrzewanie_postojowe = col2.selectbox("Ogrzewanie postojowe:", options=list(equipment_choices.keys()), format_func=format_func_equipment_ogrzewanie_postojowe)
-
-def format_func_equipment_czujnik_martwego_pola(czujnik_martwego_pola):
-    return equipment_choices[czujnik_martwego_pola]
-czujnik_martwego_pola = col3.selectbox("Asystent (czujnik) martwego pola:", options=list(equipment_choices.keys()), format_func=format_func_equipment_czujnik_martwego_pola)
-
-def format_func_equipment_kamera_w_lusterku(kamera_w_lusterku):
-    return equipment_choices[kamera_w_lusterku]
-kamera_w_lusterku = col4.selectbox("Kamera w lusterku bocznym:", options=list(equipment_choices.keys()), format_func=format_func_equipment_kamera_w_lusterku)
-
-def format_func_equipment_przyciemniane_szyby(przyciemniane_szyby):
-    return equipment_choices[przyciemniane_szyby]
-przyciemniane_szyby = col1.selectbox("Przyciemniane tylne szyby:", options=list(equipment_choices.keys()), format_func=format_func_equipment_przyciemniane_szyby)
-
-def format_func_equipment_lane_assist(lane_assist):
-    return equipment_choices[lane_assist]
-lane_assist = col2.selectbox("Lane assist - kontrola zmiany pasa ruchu:", options=list(equipment_choices.keys()), format_func=format_func_equipment_lane_assist)
-
-def format_func_equipment_tempomat_adaptacyjny(tempomat_adaptacyjny):
-    return equipment_choices[tempomat_adaptacyjny]
-tempomat_adaptacyjny = col3.selectbox("Tempomat adaptacyjny ACC:", options=list(equipment_choices.keys()), format_func=format_func_equipment_tempomat_adaptacyjny)
-
-def format_func_equipment_wspomaganie_kierownicy(wspomaganie_kierownicy):
-    return equipment_choices[wspomaganie_kierownicy]
-wspomaganie_kierownicy = col4.selectbox("Wspomaganie kierownicy:", options=list(equipment_choices.keys()), format_func=format_func_equipment_wspomaganie_kierownicy)
-
-def format_func_equipment_podgrzewana_przednia_szyba(podgrzewana_przednia_szyba):
-    return equipment_choices[podgrzewana_przednia_szyba]
-podgrzewana_przednia_szyba = col1.selectbox("Podgrzewana przednia szyba:", options=list(equipment_choices.keys()), format_func=format_func_equipment_podgrzewana_przednia_szyba)
-
-def format_func_equipment_ogranicznik_predkosci(ogranicznik_predkosci):
-    return equipment_choices[ogranicznik_predkosci]
-ogranicznik_predkosci = col2.selectbox("Ogranicznik predkośći:", options=list(equipment_choices.keys()), format_func=format_func_equipment_ogranicznik_predkosci)
-
-def format_func_equipment_tapicerka_skorzana(tapicerka_skorzana):
-    return equipment_choices[tapicerka_skorzana]
-tapicerka_skorzana = col3.selectbox("Tapicerka skórzana:", options=list(equipment_choices.keys()), format_func=format_func_equipment_tapicerka_skorzana)
-
-def format_func_equipment_klimatyzacja_2strefowa(klimatyzacja_2strefowa):
-    return equipment_choices[klimatyzacja_2strefowa]
-klimatyzacja_2strefowa = col4.selectbox("Klimatyzacja automatyczna dwustrefowa:", options=list(equipment_choices.keys()), format_func=format_func_equipment_klimatyzacja_2strefowa)
-
-def format_func_equipment_elektryczne_szyby_przednie(elektryczne_szyby_przednie):
-    return equipment_choices[elektryczne_szyby_przednie]
-elektryczne_szyby_przednie = col1.selectbox("Elektryczne szyby przednie:", options=list(equipment_choices.keys()), format_func=format_func_equipment_elektryczne_szyby_przednie)
-
-def format_func_equipment_lusterka_boczne_elektryczne(lusterka_boczne_elektryczne):
-    return equipment_choices[lusterka_boczne_elektryczne]
-lusterka_boczne_elektryczne = col2.selectbox("Lusterka boczne ustawiane elektrycznie:", options=list(equipment_choices.keys()), format_func=format_func_equipment_lusterka_boczne_elektryczne)
-
-def format_func_equipment_system_nawigacji_sat(system_nawigacji_sat):
-    return equipment_choices[system_nawigacji_sat]
-system_nawigacji_sat = col3.selectbox("System nawigacji satelitarnej:", options=list(equipment_choices.keys()), format_func=format_func_equipment_system_nawigacji_sat)
-
-def format_func_equipment_podgrzewane_lusterka_boczne(podgrzewane_lusterka_boczne):
-    return equipment_choices[podgrzewane_lusterka_boczne]
-podgrzewane_lusterka_boczne = col4.selectbox("Podgrzewane lusterka boczne:", options=list(equipment_choices.keys()), format_func=format_func_equipment_podgrzewane_lusterka_boczne)
-
-def format_func_equipment_elektryczny_fotel_kierowcy(elektryczny_fotel_kierowcy):
-    return equipment_choices[elektryczny_fotel_kierowcy]
-elektryczny_fotel_kierowcy = col1.selectbox("Elektrycznie ustawiany fotel kierowcy:", options=list(equipment_choices.keys()), format_func=format_func_equipment_elektryczny_fotel_kierowcy)
-
-
-def format_func_equipment_elektryczny_fotel_pasazera(elektryczny_fotel_pasazera):
-    return equipment_choices[elektryczny_fotel_pasazera]
-elektryczny_fotel_pasazera = col2.selectbox("Elektrycznie ustawiany fotel pasażera:", options=list(equipment_choices.keys()), format_func=format_func_equipment_elektryczny_fotel_pasazera)
-
-def format_func_equipment_podgrzewany_fotel_kierowcy(podgrzewany_fotel_kierowcy):
-    return equipment_choices[podgrzewany_fotel_kierowcy]
-podgrzewany_fotel_kierowcy = col3.selectbox("Podgrzewany fotel kierowcy:", options=list(equipment_choices.keys()), format_func=format_func_equipment_podgrzewany_fotel_kierowcy)
-
-
-                             
+fuel = col1.selectbox("Rodzaj paliwa:",['Benzyna', 'Benzyna+LPG', 'Hybryda', 'Diesel', 'Elektryczny', 'Benzyna+CNG', 'Wodór'])
+power = col2.number_input("Podaj moc w KM:")
+transmission = col3.selectbox("Skrzynia biegów:", ['Automatyczna', 'Manualna'])
+mileage = col1.number_input("Podaj przebieg w km:")
+year = col2.selectbox("Rok produkcji:", [ 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995, 1994, 1993, 1992, 1991, 1990, 1989, 1988, 1987, 1986, 1985, 1984, 1983, 1982, 1981, 1980, 1979, 1978, 1977, 1976, 1975, 1974, 1973, 1972, 1971, 1970, 1969, 1968, 1967, 1966, 1965, 1964, 1963, 1962, 1961, 1960, 1959, 1958, 1957, 1956, 1955, 1954, 1953, 1952, 1951, 1950, 1949, 1948, 1947, 1946, 1939, 1938, 1937, 1936, 1935, 1934, 1932, 1931, 1929, 1928, 1926, 1924, 1915])
+brand = col3.selectbox("Marka samochodu:", ['Abarth', 'Acura', 'Aixam', 'Alfa Romeo', 'BMW-ALPINA', 'Alpine', 'Aston Martin', 'Audi', 'Austin', 'Baic', 'Bentley', 'BMW', 'Ford', 'Toyota', 'Opel', 'Volkswagen', 'Mazda', 'Kia', 'Porsche', 'Peugeot', 'Renault', 'Citroën', 'Škoda', 'Jaguar', 'Mercedes-Benz', 'Suzuki', 'Volvo', 'Smart', 'Land Rover', 'Nissan', 'Chevrolet', 'Seat', 'Infiniti', 'Fiat', 'Honda', 'Hyundai', 'Subaru', 'Lexus', 'Jeep', 'Dacia', 'SsangYong', 'Brilliance', 'Buick', 'Cadillac', 'Casalini', 'Chatenet', 'Chrysler', 'Cupra', 'Daewoo', 'Daihatsu', 'DFSK', 'DKW', 'Dodge', 'DS Automobiles', 'FAW', 'Ferrari', 'Gaz', 'GMC', 'Gonow', 'Grecav', 'Hummer', 'Inny', 'Isuzu', 'Iveco', 'Lada', 'Lamborghini', 'Lancia', 'LEVC', 'Ligier', 'Lincoln', 'Lotus', 'LTI', 'LuAZ', 'MAN', 'Maserati', 'Maybach', 'McLaren', 'Mercury', 'MG', 'Microcar', 'MINI', 'Mitsubishi', 'Moskwicz', 'NSU', 'Nysa', 'Oldsmobile', 'Plymouth', 'Polonez', 'Pontiac', 'Radical', 'RAM', 'Rolls-Royce', 'Rover', 'Saab', 'Scion', 'Tarpan', 'Tata', 'Tesla', 'Trabant', 'Triumph', 'Uaz', 'Vauxhall', 'Wołga', 'Wartburg'])
+model = col1.selectbox("Model samochodu:", ['1.3 (Wartburg)', '1.5 (Polonez)', '1.6 (Polonez)', '10 (Renault)', '100 (Audi)', '100 (Škoda)', '100 NX (Nissan)', '1000 (NSU)', '1007 (Peugeot)', '106 (Peugeot)', '107 (Peugeot)', '108 (Peugeot)', '12 (Renault)', '120 (Škoda)', '121 (Mazda)', '124 (Abarth)', '124 (Fiat)', '124 Spider (Fiat)', '125p (Fiat)', '126 (Fiat)', '130 (Fiat)', '1300 (Lada)', '131 (Fiat)', '1310 (Dacia)', '132 (Fiat)', '145 (Alfa Romeo)', '146 (Alfa Romeo)', '147 (Alfa Romeo)', '1500 (Chevrolet)', '1500 (RAM)', '155 (Alfa Romeo)', '156 (Alfa Romeo)', '159 (Alfa Romeo)', '164 (Alfa Romeo)', '166 (Alfa Romeo)', '18 (Renault)', '19 (Renault)', '1M (BMW)', '2 (Mazda)', '2 CV (Citroën)', '20 (Renault)', '200 (Audi)', '200 (Chrysler)', '200 (Rover)', '200 SX (Nissan)', '2008 (Peugeot)', '204 (Peugeot)', '205 (Peugeot)', '206 (Peugeot)', '206 CC (Peugeot)', '206 plus (Peugeot)', '207 (Peugeot)', '207 CC (Peugeot)', '208 (Peugeot)', '2103 (Lada)', '2105 (Lada)', '2107 (Lada)', '2108 (Lada)', '2110 (Lada)', '214 (Rover)', '2410 (Wołga)', '25 (Renault)', '25 (Rover)', '2500 (RAM)', '280 (Mercedes-Benz)', '280 ZX (Nissan)', '3 (Mazda)', '300 (Chrysler)', '300 ZX (Nissan)', '3000GT (Mitsubishi)', '3008 (Peugeot)', '300C (Chrysler)', '300M (Chrysler)', '300s (Chrysler)', '301 (Peugeot)', '304 (Peugeot)', '306 (Peugeot)', '307 (Peugeot)', '307 CC (Peugeot)', '308 (Ferrari)', '308 (Peugeot)', '308 CC (Peugeot)', '309 (Peugeot)', '311 (Wartburg)', '323 (Mazda)', '323F (Mazda)', '33 (Alfa Romeo)', '348 (Ferrari)', '350 Z (Nissan)', '353 (Wartburg)', '356 (Porsche)', '370 Z (Nissan)', '3GT (BMW)', '4 (Renault)', '4-Runner (Toyota)', '400 (Rover)', '4007 (Peugeot)', '4008 (Peugeot)', '403 (Moskwicz)', '404 (Peugeot)', '405 (Peugeot)', '406 (Peugeot)', '407 (Moskwicz)', '407 (Peugeot)', '408 (Moskwicz)', '414 (Rover)', '45 (Rover)', '458 Italia (Ferrari)', '469 B (Uaz)', '488 (Ferrari)', '4C (Alfa Romeo)', '5 (Mazda)', '5 (Renault)', '500 (Abarth)', '500 (Fiat)', '5008 (Peugeot)', '500L (Fiat)', '500X (Fiat)', '508 (Peugeot)', '57 (Maybach)', '570 GT (McLaren)', '570S Coupe (McLaren)', '575 (Ferrari)', '595 (Abarth)', '5GT (BMW)', '6 (Mazda)', '600 (Fiat)', '600LT Spider (McLaren)', '601 (Trabant)', '605 (Peugeot)', '607 (Peugeot)', '620 (Rover)', '626 (Mazda)', '650S (McLaren)', '69 (Gaz)', '695 (Abarth)', '6GT (BMW)', '718 Boxster (Porsche)', '718 Cayman (Porsche)', '718 Spyder (Porsche)', '720S Coupe (McLaren)', '720S Spider (McLaren)', '75 (Rover)', '780 (Volvo)', '8 (Renault)', '80 (Audi)', '807 (Peugeot)', '812 Superfast (Ferrari)', '820 (Rover)', '850 (Fiat)', '850 (Volvo)', '9-3 (Saab)', '9-3X (Saab)', '9-5 (Saab)', '9-7X (Saab)', '90 (Audi)', '90 (Saab)', '900 (Saab)', '9000 (Saab)', '911 (Porsche)', '914 (Porsche)', '924 (Porsche)', '928 (Porsche)', '929 (Mazda)', '944 (Porsche)', '96 (Saab)', '965 (Volvo)', '968 (Porsche)', '969 (LuAZ)', '99 (Saab)', 'A1 (Audi)', 'A110 (Alpine)', 'A2 (Audi)', 'A3 (Audi)', 'A4 (Audi)', 'A4 Allroad (Audi)', 'A5 (Audi)', 'A6 (Audi)', 'A6 Allroad (Audi)', 'A7 (Audi)', 'A721 (Aixam)', 'A741 (Aixam)', 'A8 (Audi)', 'AMG GT (Mercedes-Benz)', 'ASX (Mitsubishi)', 'ATS (Cadillac)', 'AX (Citroën)', 'Acadia (GMC)', 'Accent (Hyundai)', 'Accord (Honda)', 'Actyon (SsangYong)', 'Adam (Opel)', 'Agila (Opel)', 'Albea (Fiat)', 'Alero (Chevrolet)', 'Alfasud (Alfa Romeo)', 'Alfetta (Alfa Romeo)', 'Alhambra (Seat)', 'Allegro (Austin)', 'Almera (Nissan)', 'Almera Tino (Nissan)', 'Alpine V6 (Renault)', 'Altea (Seat)', 'Altea XL (Seat)', 'Altima (Nissan)', 'Alto (Suzuki)', 'Amarok (Volkswagen)', 'Ambra (Ligier)', 'Ampera (Opel)', 'Antara (Opel)', 'Ariya (Nissan)', 'Arkana (Renault)', 'Armada (Nissan)', 'Arnage (Bentley)', 'Arona (Seat)', 'Arosa (Seat)', 'Arteon (Volkswagen)', 'Ascent (Subaru)', 'Aspen (Chrysler)', 'Astra (Opel)', 'Astra (Vauxhall)', 'Astro (Chevrolet)', 'Ateca (Cupra)', 'Ateca (Seat)', 'Atlas (Volkswagen)', 'Atos (Hyundai)', 'Atu (Polonez)', 'Auris (Toyota)', 'Avalanche (Chevrolet)', 'Avalon (Toyota)', 'Avante (Hyundai)', 'Avantime (Renault)', 'Avenger (Dodge)', 'Avensis (Toyota)', 'Avensis Verso (Toyota)', 'Aventador (Lamborghini)', 'Aveo (Chevrolet)', 'Aviator (Lincoln)', 'Aygo (Toyota)', 'B-MAX (Ford)', 'B10 (BMW-ALPINA)', 'B3 (BMW-ALPINA)', 'B4 (BMW-ALPINA)', 'B5 (BMW-ALPINA)', 'B7 (BMW-ALPINA)', 'B8 (BMW-ALPINA)', 'B9 Tribeca (Subaru)', 'BLS (Cadillac)', 'BRZ (Subaru)', 'BS4 (Brilliance)', 'BT-50 (Mazda)', 'BX (Citroën)', 'Baleno (Suzuki)', 'Barchetta (Fiat)', 'Bayon (Hyundai)', 'Beetle (Volkswagen)', 'Bel Air (Chevrolet)', 'Belvedere (Plymouth)', 'Bentayga (Bentley)', 'Beretta (Chevrolet)', 'Berlingo (Citroën)', 'Beta (Lancia)', 'Bipper (Peugeot)', 'Biturbo (Maserati)', 'Blazer (Chevrolet)', 'Bluebird (Nissan)', 'Bolt (Chevrolet)', 'Bonneville (Pontiac)', 'Bora (Volkswagen)', 'Boxer (Peugeot)', 'Boxster (Porsche)', 'Brava (Fiat)', 'Bravo (Fiat)', 'Brera (Alfa Romeo)', 'Bronco (Ford)', 'Brougham (Cadillac)', 'C-10 (Chevrolet)', 'C-20 (Chevrolet)', 'C-Crosser (Citroën)', 'C-Elysée (Citroën)', 'C-HR (Toyota)', 'C-MAX (Ford)', 'C-Zero (Citroën)', 'C1 (Citroën)', 'C2 (Citroën)', 'C3 (Citroën)', 'C3 Aircross (Citroën)', 'C3 Picasso (Citroën)', 'C3 Pluriel (Citroën)', 'C30 (Volvo)', 'C4 (Citroën)', 'C4 Aircross (Citroën)', 'C4 Cactus (Citroën)', 'C4 Grand Picasso (Citroën)', 'C4 Picasso (Citroën)', 'C4 SpaceTourer (Citroën)', 'C40 (Volvo)', 'C5 (Citroën)', 'C5 Aircross (Citroën)', 'C5X (Citroën)', 'C6 (Citroën)', 'C70 (Volvo)', 'C8 (Citroën)', 'CC (Volkswagen)', 'CH22 Barooder (Chatenet)', 'CH26 (Chatenet)', 'CH40 (Chatenet)', 'CJ (Jeep)', 'CL (Acura)', 'CL (Mercedes-Benz)', 'CLA (Mercedes-Benz)', 'CLC (Mercedes-Benz)', 'CLK (Mercedes-Benz)', 'CLS (Mercedes-Benz)', 'CR-V (Honda)', 'CR-Z (Honda)', 'CRX (Honda)', 'CT (Lexus)', 'CT6 (Cadillac)', 'CTS (Cadillac)', 'CX (Citroën)', 'CX-3 (Mazda)', 'CX-30 (Mazda)', 'CX-5 (Mazda)', 'CX-60 (Mazda)', 'CX-7 (Mazda)', 'CX-9 (Mazda)', 'Cabriolet (Audi)', 'Caddy (Volkswagen)', 'Caliber (Dodge)', 'Calibra (Opel)', 'California (Ferrari)', 'California (Volkswagen)', 'Camaro (Chevrolet)', 'Camry (Toyota)', 'Camry Solara (Toyota)', 'Capri (Ford)', 'Caprice (Chevrolet)', 'Captiva (Chevrolet)', 'Captur (Renault)', 'Caravan (Dodge)', 'Caravelle (Volkswagen)', 'Carens (Kia)', 'Cargo (Microcar)', 'Carina (Toyota)', 'Carisma (Mitsubishi)', 'Carnival (Kia)', 'Caro (Polonez)', 'Cascada (Opel)', 'Cavalier (Chevrolet)', 'Cayenne (Porsche)', 'Cayman (Porsche)', 'Ceed (Kia)', 'Celerio (Suzuki)', 'Celica (Toyota)', 'Century (Buick)', 'Cerato (Kia)', 'Chairman (Daewoo)', 'Challenger (Dodge)', 'Charade (Daihatsu)', 'Charger (Dodge)', 'Cherokee (Jeep)', 'Chevelle (Chevrolet)', 'Chevy Van (Chevrolet)', 'Cinquecento (Fiat)', 'Citan (Mercedes-Benz)', 'Citigo (Škoda)', 'City (Aixam)', 'City (Honda)', 'Civic (Honda)', 'Clarus (Kia)', 'Clio (Renault)', 'Clubman (MINI)', 'Cobalt (Chevrolet)', 'Colorado (Chevrolet)', 'Colt (Mitsubishi)', 'Comanche (Jeep)', 'Combo (Opel)', 'Commander (Jeep)', 'Commodore (Opel)', 'Compass (Jeep)', 'Concerto (Honda)', 'Concorde (Chrysler)', 'Continental (Lincoln)', 'Continental Flying Spur (Bentley)', 'Continental GT (Bentley)', 'Cooper (MINI)', 'Cooper S (MINI)', 'Cordoba (Seat)', 'Corolla (Toyota)', 'Corolla Verso (Toyota)', 'Corrado (Volkswagen)', 'Corsa (Opel)', 'Corvette (Chevrolet)', 'Cougar (Ford)', 'Cougar (Mercury)', 'Countryman (MINI)', 'Coupe (Aixam)', 'Coupe (Audi)', 'Coupe (Fiat)', 'Coupe (Hyundai)', 'Coupe (Renault)', 'Courier (Ford)', 'Crafter (Volkswagen)', 'Croma (Fiat)', 'Crossfire (Chrysler)', 'Crossland X (Opel)', 'Crossline (Aixam)', 'Crossover (Aixam)', 'Crosswagon (Alfa Romeo)', 'Crown (Ford)', 'Crown (Toyota)', 'Cruze (Chevrolet)', 'Cube (Nissan)', 'Cuore (Daihatsu)', 'Cutlass (Oldsmobile)', 'D-Max (Isuzu)', 'D3 (BMW-ALPINA)', 'DB11 (Aston Martin)', 'DB7 (Aston Martin)', 'DB9 (Aston Martin)', 'DBS Superleggera (Aston Martin)', 'DBX (Aston Martin)', 'DS (Citroën)', 'DS 3 (DS Automobiles)', 'DS 3 Crossback (DS Automobiles)', 'DS 4 (DS Automobiles)', 'DS 4 Crossback (DS Automobiles)', 'DS 5 (DS Automobiles)', 'DS 7 Crossback (DS Automobiles)', 'DS 9 (DS Automobiles)', 'DS3 (Citroën)', 'DS4 (Citroën)', 'DS5 (Citroën)', 'DTS (Cadillac)', 'DUE (Microcar)', 'Daily (Iveco)', 'Daimler (Jaguar)', 'Dakota (Dodge)', 'Dart (Dodge)', 'Dawn (Rolls-Royce)', 'Defender (Land Rover)', 'Delta (Lancia)', 'Delta 88 (Oldsmobile)', 'Demio (Mazda)', 'Deville (Cadillac)', 'Diablo (Lamborghini)', 'Dino GT4 (Ferrari)', 'Discovery (Land Rover)', 'Discovery Sport (Land Rover)', 'Doblo (Fiat)', 'Dokker (Dacia)', 'Dokker Van (Dacia)', 'Dolomite (Triumph)', 'Ducato (Fiat)', 'Durango (Dodge)', 'Duster (Dacia)', 'Dyna (Toyota)', 'E-Pace (Jaguar)', 'E-Type (Jaguar)', 'EDGE (Ford)', 'EQA (Mercedes-Benz)', 'EQB (Mercedes-Benz)', 'EQC (Mercedes-Benz)', 'EQE (Mercedes-Benz)', 'EQS (Mercedes-Benz)', 'EQV (Mercedes-Benz)', 'ES (Chrysler)', 'ES (Lexus)', 'EV6 (Kia)', 'EX (Infiniti)', 'Eclipse (Mitsubishi)', 'Eclipse Cross (Mitsubishi)', 'EcoSport (Ford)', 'Econoline (Ford)', 'Eighty - Eight (Oldsmobile)', 'El Camino (Chevrolet)', 'Elan (Kia)', 'Elantra (Hyundai)', 'Eldorado (Cadillac)', 'Electra (Buick)', 'Elise (Lotus)', 'Enclave (Buick)', 'Encore (Buick)', 'Endeavor (Mitsubishi)', 'Envoy (GMC)', 'Enyaq (Škoda)', 'Eos (Volkswagen)', 'Epica (Chevrolet)', 'Equinox (Chevrolet)', 'Escalade (Cadillac)', 'Escape (Ford)', 'Escort (Ford)', 'Espace (Renault)', 'Esprit (Lotus)', 'Evanda (Daewoo)', 'Evasion (Citroën)', 'Excursion (Ford)', 'Exeo (Seat)', 'Exige (Lotus)', 'Expedition (Ford)', 'Expert (Peugeot)', 'Explorer (Ford)', 'Express (Chevrolet)', 'Express (Renault)', 'F (MG)', 'F-Pace (Jaguar)', 'F-Type (Jaguar)', 'F150 (Ford)', 'F250 (Ford)', 'F350 (Ford)', 'F430 (Ferrari)', 'F8 Spider (Ferrari)', 'F8 Tributo (Ferrari)', 'FF (Ferrari)', 'FJ (Toyota)', 'FR-V (Honda)', 'FX (Infiniti)', 'Fabia (Škoda)', 'Fairway (LTI)', 'Falcon (Ford)', 'Favorit (Škoda)', 'Felicia (Škoda)', 'Fengon 5 (DFSK)', 'Fengon 500 (DFSK)', 'Fengon 580 (DFSK)', 'Fengon 7 (DFSK)', 'Feroza (Daihatsu)', 'Fiero (Pontiac)', 'Fiesta (Ford)', 'Fiorino (Fiat)', 'Firebird (Pontiac)', 'Fleetwood (Cadillac)', 'Flex (Ford)', 'Flex (Microcar)', 'Fluence (Renault)', 'Focus (Ford)', 'Focus C-Max (Ford)', 'Forester (Subaru)', 'Forfour (Smart)', 'Formentor (Cupra)', 'Fortwo (Smart)', 'Fox (Volkswagen)', 'Freelander (Land Rover)', 'Freemont (Fiat)', 'Freestyle (Ford)', 'Frontera (Opel)', 'Frontier (Nissan)', 'Fullback (Fiat)', 'Fulvia (Lancia)', 'Fusion (Ford)', 'G (Infiniti)', 'G3X Justy (Subaru)', 'G6 (Pontiac)', 'GL (Mercedes-Benz)', 'GLA (Mercedes-Benz)', 'GLB (Mercedes-Benz)', 'GLC (Mercedes-Benz)', 'GLE (Mercedes-Benz)', 'GLK (Mercedes-Benz)', 'GLS (Mercedes-Benz)', 'GS (Lexus)', 'GT (Alfa Romeo)', 'GT (Opel)', 'GT-R (Nissan)', 'GT86 (Toyota)', 'GTC4Lusso (Ferrari)', 'GTO (Aixam)', 'GTV (Alfa Romeo)', 'GX (Lexus)', 'Galant (Mitsubishi)', 'Galaxy (Ford)', 'Gallardo (Lamborghini)', 'Galloper (Hyundai)', 'Gamma (Lancia)', 'Garbus (Volkswagen)', 'Genesis (Hyundai)', 'Genesis Coupe (Hyundai)', 'Getz (Hyundai)', 'Ghibli (Maserati)', 'Ghost (Rolls-Royce)', 'Giulia (Alfa Romeo)', 'Giulietta (Alfa Romeo)', 'Gladiator (Jeep)', 'Glory 580 (DFSK)', 'Golf (Volkswagen)', 'Golf Plus (Volkswagen)', 'Golf Sportsvan (Volkswagen)', 'GranCabrio (Maserati)', 'GranTurismo (Maserati)', 'Grand C-MAX (Ford)', 'Grand Caravan (Dodge)', 'Grand Cherokee (Jeep)', 'Grand Espace (Renault)', 'Grand Santa Fe (Hyundai)', 'Grand Scenic (Renault)', 'Grand Vitara (Suzuki)', 'Grand Voyager (Chrysler)', 'Grand-Prix (Pontiac)', 'Grande Punto (Abarth)', 'Grande Punto (Fiat)', 'Grandeur (Hyundai)', 'Grandis (Mitsubishi)', 'Grandland X (Opel)', 'H-1 (Hyundai)', 'H1 (Hummer)', 'H2 (Hummer)', 'H200 (Hyundai)', 'H3 (Hummer)', 'HHR (Chevrolet)', 'HQ (FAW)', 'HR-V (Honda)', 'Healey (Austin)', 'Hiace (Toyota)', 'Highland X (Microcar)', 'Highlander (Toyota)', 'Hilux (Toyota)', 'Honker (Tarpan)', 'Huracan (Lamborghini)', 'I-Pace (Jaguar)', 'I30 (Hyundai)', 'ID.3 (Volkswagen)', 'ID.4 (Volkswagen)', 'ID.5 (Volkswagen)', 'ID.Buzz (Volkswagen)', 'IONIQ (Hyundai)', 'IS (Lexus)', 'IXO (Ligier)', 'Ibiza (Seat)', 'Idea (Fiat)', 'Ignis (Suzuki)', 'Impala (Chevrolet)', 'Impreza (Subaru)', 'Indica (Tata)', 'Inny (Abarth)', 'Inny (Acura)', 'Inny (Aixam)', 'Inny (Alfa Romeo)', 'Inny (Audi)', 'Inny (Austin)', 'Inny (BMW)', 'Inny (BMW-ALPINA)', 'Inny (Bentley)', 'Inny (Buick)', 'Inny (Cadillac)', 'Inny (Chatenet)', 'Inny (Chevrolet)', 'Inny (Chrysler)', 'Inny (Citroën)', 'Inny (DKW)', 'Inny (DS Automobiles)', 'Inny (Dacia)', 'Inny (Daewoo)', 'Inny (Dodge)', 'Inny (Fiat)', 'Inny (Ford)', 'Inny (Grecav)', 'Inny (Honda)', 'Inny (Hummer)', 'Inny (Hyundai)', 'Inny (Inny)', 'Inny (Isuzu)', 'Inny (Jaguar)', 'Inny (Jeep)', 'Inny (Kia)', 'Inny (Lancia)', 'Inny (Land Rover)', 'Inny (Lexus)', 'Inny (Ligier)', 'Inny (Lincoln)', 'Inny (MG)', 'Inny (MINI)', 'Inny (Maserati)', 'Inny (Maybach)', 'Inny (Mazda)', 'Inny (Mercedes-Benz)', 'Inny (Mercury)', 'Inny (Microcar)', 'Inny (Mitsubishi)', 'Inny (NSU)', 'Inny (Nissan)', 'Inny (Nysa)', 'Inny (Oldsmobile)', 'Inny (Opel)', 'Inny (Peugeot)', 'Inny (Plymouth)', 'Inny (Polonez)', 'Inny (Pontiac)', 'Inny (Porsche)', 'Inny (Renault)', 'Inny (Rolls-Royce)', 'Inny (Rover)', 'Inny (Scion)', 'Inny (Smart)', 'Inny (Subaru)', 'Inny (Suzuki)', 'Inny (Tarpan)', 'Inny (Toyota)', 'Inny (Trabant)', 'Inny (Triumph)', 'Inny (Uaz)', 'Inny (Vauxhall)', 'Inny (Volkswagen)', 'Inny (Volvo)', 'Inny (Wartburg)', 'Insight (Honda)', 'Insignia (Opel)', 'Integra (Honda)', 'Interstar (Nissan)', 'JS RC (Ligier)', 'JS50 (Ligier)', 'JS50L (Ligier)', 'JS60 (Ligier)', 'Jazz (Honda)', 'Jetta (Volkswagen)', 'Jimny (Suzuki)', 'Jogger (Dacia)', 'John Cooper Works (MINI)', 'Journey (Dodge)', 'Juke (Nissan)', 'Jumper (Citroën)', 'Jumpy Combi (Citroën)', 'Justy (Subaru)', 'KA (Ford)', 'Ka+ (Ford)', 'Kadett (Opel)', 'Kadjar (Renault)', 'Kafer (Volkswagen)', 'Kalina (Lada)', 'Kalos (Chevrolet)', 'Kalos (Daewoo)', 'Kamiq (Škoda)', 'Kangoo (Renault)', 'Kappa (Lancia)', 'Karl (Opel)', 'Karmann Ghia (Volkswagen)', 'Karoq (Škoda)', 'Kizashi (Suzuki)', 'Klasa A (Mercedes-Benz)', 'Klasa B (Mercedes-Benz)', 'Klasa C (Mercedes-Benz)', 'Klasa E (Mercedes-Benz)', 'Klasa G (Mercedes-Benz)', 'Klasa R (Mercedes-Benz)', 'Klasa S (Mercedes-Benz)', 'Klasa V (Mercedes-Benz)', 'Klasa X (Mercedes-Benz)', 'Kodiaq (Škoda)', 'Koleos (Renault)', 'Kona (Hyundai)', 'Korando (SsangYong)', 'Kubistar (Nissan)', 'Kuga (Ford)', 'Kyron (SsangYong)', 'L200 (Mitsubishi)', 'L300 (Mitsubishi)', 'LC (Lexus)', 'LJ (Suzuki)', 'LS (Lexus)', 'LT (Volkswagen)', 'LX (Lexus)', 'Lacetti (Chevrolet)', 'Lacetti (Daewoo)', 'Laguna (Renault)', 'Lancer (Mitsubishi)', 'Lancer Evolution (Mitsubishi)', 'Land Cruiser (Toyota)', 'Lanos (Daewoo)', 'Latitude (Renault)', 'Le Baron (Chrysler)', 'Le Mans (Pontiac)', 'Le Sabre (Buick)', 'Leaf (Nissan)', 'Legacy (Subaru)', 'Legend (Honda)', 'Leon (Cupra)', 'Leon (Seat)', 'Leon Sportstourer (Cupra)', 'Levante (Maserati)', 'Levorg (Subaru)', 'Liana (Suzuki)', 'Liberty (Jeep)', 'Ligier (Microcar)', 'Linea (Fiat)', 'Lodgy (Dacia)', 'Logan (Dacia)', 'Logan Van (Dacia)', 'Lumina (Chevrolet)', 'Lupo (Volkswagen)', 'Lybra (Lancia)', 'M (Infiniti)', 'M.GO (Microcar)', 'M14 2.0 (Casalini)', 'M2 (BMW)', 'M3 (BMW)', 'M4 (BMW)', 'M5 (BMW)', 'M6 (BMW)', 'M8 (BMW)', 'MC (Microcar)', 'MDX (Acura)', 'MG (Rover)', 'MGA (MG)', 'MGB (MG)', 'MGF (MG)', 'MK II (Jaguar)', 'MKX (Lincoln)', 'MKZ (Lincoln)', 'ML (Mercedes-Benz)', 'MPV (Mazda)', 'MR2 (Toyota)', 'MUSSO (Daewoo)', 'MUSSO (SsangYong)', 'MX-3 (Mazda)', 'MX-30 (Mazda)', 'MX-5 (Mazda)', 'Macan (Porsche)', 'Magentis (Kia)', 'Magnum (Dodge)', 'Malibu (Chevrolet)', 'Marauder (Mercury)', 'Marea (Fiat)', 'Mark (Lincoln)', 'Massif (Iveco)', 'Master (Renault)', 'Materia (Daihatsu)', 'Matiz (Chevrolet)', 'Matiz (Daewoo)', 'Matrix (Hyundai)', 'Maverick (Ford)', 'Maxima (Nissan)', 'Media (Chatenet)', 'Megane (Renault)', 'Meriva (Opel)', 'Micra (Nissan)', 'Mii (Seat)', 'Mini (Austin)', 'Mirai (Toyota)', 'Mito (Alfa Romeo)', 'Model 3 (Tesla)', 'Model S (Tesla)', 'Model X (Tesla)', 'Modus (Renault)', 'Mokka (Opel)', 'Mondeo (Ford)', 'Mondial (Ferrari)', 'Monte Carlo (Chevrolet)', 'Monterey (Opel)', 'Movano (Opel)', 'Mulsanne (Bentley)', 'Multipla (Fiat)', 'Multivan (Volkswagen)', 'Murano (Nissan)', 'Musa (Lancia)', 'Mustang (Ford)', 'Mustang Mach-E (Ford)', 'NP300 Pickup (Nissan)', 'NSX (Acura)', 'NV200 (Nissan)', 'NV300 (Nissan)', 'NV400 (Nissan)', 'NX (Lexus)', 'Navara (Nissan)', 'Navigator (Lincoln)', 'Nemo (Citroën)', 'New Beetle (Volkswagen)', 'New Yorker (Chrysler)', 'Niro (Kia)', 'Nitro (Dodge)', 'Niva (Lada)', 'Note (Nissan)', 'Nova (Chevrolet)', 'Nubira (Chevrolet)', 'Nubira (Daewoo)', 'ONE (MINI)', 'OUTBACK (Subaru)', 'Octavia (Škoda)', 'Odyssey (Honda)', 'Omega (Opel)', 'Opirus (Kia)', 'Optima (Kia)', 'Orlando (Chevrolet)', 'Outlander (Mitsubishi)', 'PT Cruiser (Chrysler)', 'Paceman (MINI)', 'Pacifica (Chrysler)', 'Pajero (Mitsubishi)', 'Pajero Pinin (Mitsubishi)', 'Palio (Fiat)', 'Panamera (Porsche)', 'Panda (Fiat)', 'Park Avenue (Buick)', 'Partner (Peugeot)', 'Paseo (Toyota)', 'Passat (Volkswagen)', 'Passat CC (Volkswagen)', 'Pathfinder (Nissan)', 'Patriot (Jeep)', 'Patrol (Nissan)', 'Phaeton (Volkswagen)', 'Phedra (Lancia)', 'Picanto (Kia)', 'Pickup (Nissan)', 'Pilot (Honda)', 'Pixo (Nissan)', 'Polo (Volkswagen)', 'Pony (Hyundai)', 'Portofino (Ferrari)', 'Praktik (Škoda)', 'Prelude (Honda)', 'Premacy (Mazda)', 'Previa (Toyota)', 'Pride (Kia)', 'Primastar (Nissan)', 'Primera (Nissan)', 'Prius (Toyota)', 'Prius+ (Toyota)', 'ProAce (Toyota)', "Pro_cee'd (Kia)", 'Proace City (Toyota)', 'Proace City Verso (Toyota)', 'Proace Verso (Toyota)', 'Probe (Ford)', 'Prowler (Chrysler)', 'Pulsar (Nissan)', 'Puma (Ford)', 'Punto (Fiat)', 'Punto 2012 (Fiat)', 'Punto Evo (Fiat)', 'Q2 (Audi)', 'Q3 (Audi)', 'Q30 (Infiniti)', 'Q4 (Audi)', 'Q4 Sportback (Audi)', 'Q5 (Audi)', 'Q50 (Infiniti)', 'Q60 (Infiniti)', 'Q7 (Audi)', 'Q70 (Infiniti)', 'Q8 (Audi)', 'QX (Infiniti)', 'QX30 (Infiniti)', 'QX50 (Infiniti)', 'QX60 (Infiniti)', 'QX70 (Infiniti)', 'QX80 (Infiniti)', 'Qashqai (Nissan)', 'Qashqai+2 (Nissan)', 'Quattro (Audi)', 'Quattroporte (Maserati)', 'Qubo (Fiat)', 'Quest (Nissan)', 'R8 (Audi)', 'RAM (Dodge)', 'RAPID (Škoda)', 'RAV4 (Toyota)', 'RC (Lexus)', 'RCZ (Peugeot)', 'RDX (Acura)', 'REXTON (SsangYong)', 'RL (Acura)', 'RS Q3 (Audi)', 'RS Q8 (Audi)', 'RS3 (Audi)', 'RS4 (Audi)', 'RS5 (Audi)', 'RS6 (Audi)', 'RS7 (Audi)', 'RX (Lexus)', 'RX-7 (Mazda)', 'RX-8 (Mazda)', 'Ranchero (Ford)', 'Range Rover (Land Rover)', 'Range Rover Evoque (Land Rover)', 'Range Rover Sport (Land Rover)', 'Range Rover Velar (Land Rover)', 'Ranger (Ford)', 'Ranger Raptor (Ford)', 'Rapide (Aston Martin)', 'Regal (Buick)', 'Regency (Oldsmobile)', 'Rekord (Opel)', 'Renegade (Jeep)', 'Retona (Kia)', 'Rezzo (Chevrolet)', 'Rezzo (Daewoo)', 'Ridgeline (Honda)', 'Rifter (Peugeot)', 'Rio (Kia)', 'Riviera (Buick)', 'Road Runner (Plymouth)', 'Roadline (Aixam)', 'Roadmaster (Buick)', 'Roadster (Smart)', 'Rocky (Daihatsu)', 'Rodius (SsangYong)', 'Rogue (Nissan)', 'Roma (Ferrari)', 'Ronda (Seat)', 'Roomster (Škoda)', 'Routan (Volkswagen)', 'S 2000 (Honda)', 'S-10 (Chevrolet)', 'S-Max (Ford)', 'S-Type (Jaguar)', 'S1 (Audi)', 'S3 (Audi)', 'S4 (Audi)', 'S40 (Volvo)', 'S5 (Audi)', 'S6 (Audi)', 'S60 (Volvo)', 'S7 (Audi)', 'S70 (Volvo)', 'S8 (Audi)', 'S80 (Volvo)', 'S90 (Volvo)', 'SC (Lexus)', 'SF90 Stradale (Ferrari)', 'SL (Mercedes-Benz)', 'SLC (Mercedes-Benz)', 'SLK (Mercedes-Benz)', 'SLR (Mercedes-Benz)', 'SLS (Mercedes-Benz)', 'SQ5 (Audi)', 'SQ7 (Audi)', 'SQ8 (Audi)', 'SR3 RSX (Radical)', 'SRX (Cadillac)', 'STS (Cadillac)', 'STS-V (Cadillac)', 'SVX (Subaru)', 'SX4 (Suzuki)', 'SX4 S-Cross (Suzuki)', 'Safari (GMC)', 'Safrane (Renault)', 'Samara (Lada)', 'Samurai (Suzuki)', 'Sandero (Dacia)', 'Sandero Stepway (Dacia)', 'Santa Fe (Hyundai)', 'Santana (Volkswagen)', 'Saratoga (Chrysler)', 'Savana (GMC)', 'Saxo (Citroën)', 'Scala (Škoda)', 'Scenic (Renault)', 'Scenic Conquest (Renault)', 'Scenic RX4 (Renault)', 'Scirocco (Volkswagen)', 'Scorpio (Ford)', 'Scudo (Fiat)', 'Sebring (Chrysler)', 'Sedici (Fiat)', 'Sedona (Kia)', 'Seicento (Fiat)', 'Senator (Opel)', 'Senova X35 (Baic)', 'Senova X55 (Baic)', 'Sequoia (Toyota)', 'Seres 3 (DFSK)', 'Seria 1 (BMW)', 'Seria 2 (BMW)', 'Seria 200 (Volvo)', 'Seria 3 (BMW)', 'Seria 300 (Volvo)', 'Seria 4 (BMW)', 'Seria 400 (Volvo)', 'Seria 5 (BMW)', 'Seria 500 (Nysa)', 'Seria 6 (BMW)', 'Seria 7 (BMW)', 'Seria 700 (Volvo)', 'Seria 8 (BMW)', 'Seria 900 (Volvo)', 'Seria B (Mazda)', 'Seville (Cadillac)', 'Sharan (Volkswagen)', 'Shuttle (Honda)', 'Siena (Fiat)', 'Sienna (Toyota)', 'Sierra (Ford)', 'Sierra (GMC)', 'Sigma (Mitsubishi)', 'Signum (Opel)', 'Silver Seraph (Rolls-Royce)', 'Silver Shadow (Rolls-Royce)', 'Silver Spirit (Rolls-Royce)', 'Silver Spur (Rolls-Royce)', 'Silverado (Chevrolet)', 'Silvia (Nissan)', 'Sirion (Daihatsu)', 'Skylark (Buick)', 'Skyline (Nissan)', 'Solstice (Pontiac)', 'Sonata (Hyundai)', 'Sorento (Kia)', 'Soul (Kia)', 'Space Runner (Mitsubishi)', 'Space Star (Mitsubishi)', 'Space Wagon (Mitsubishi)', 'SpaceTourer (Citroën)', 'Spark (Chevrolet)', 'Speedster (Opel)', 'Spider (Alfa Romeo)', 'Spitfire (Triumph)', 'Splash (Suzuki)', 'Sportage (Kia)', 'Spring (Dacia)', 'Sprinter (Mercedes-Benz)', 'Starlet (Toyota)', 'Stelvio (Alfa Romeo)', 'Stilo (Fiat)', 'Stinger (Kia)', 'Stonic (Kia)', 'Strada (Fiat)', 'Stratus (Chrysler)', 'Stream (Honda)', 'Streetka (Ford)', 'Streetwise (Rover)', 'Suburban (Chevrolet)', 'Sunny (Nissan)', 'Super Seven (Lotus)', 'Superb (Škoda)', 'Supra (Toyota)', 'Swace (Suzuki)', 'Swift (Suzuki)', 'T-Cross (Volkswagen)', 'T-Roc (Volkswagen)', 'TD (MG)', 'TF (MG)', 'TGE (MAN)', 'TL (Acura)', 'TR3 (Triumph)', 'TR4 (Triumph)', 'TR5 (Triumph)', 'TR7 (Triumph)', 'TSX (Acura)', 'TT (Audi)', 'TT RS (Audi)', 'TT S (Audi)', 'TX (LEVC)', 'TX2 (LTI)', 'TX4 (LTI)', 'Tacoma (Toyota)', 'Tacuma (Chevrolet)', 'Tacuma (Daewoo)', 'Tahoe (Chevrolet)', 'Taigo (Volkswagen)', 'Talento (Fiat)', 'Talisman (Renault)', 'Tarraco (Seat)', 'Taunus (Ford)', 'Taurus (Ford)', 'Taycan (Porsche)', 'Tempra (Fiat)', 'Teramont (Volkswagen)', 'Tercel (Toyota)', 'Terios (Daihatsu)', 'Terracan (Hyundai)', 'Terrain (GMC)', 'Terrano (Nissan)', 'Testarossa (Ferrari)', 'Thalia (Renault)', 'Thema (Lancia)', 'Thesis (Lancia)', 'Thunderbird (Ford)', 'Tico (Daewoo)', 'Tigra (Opel)', 'Tiguan (Volkswagen)', 'Tiguan Allspace (Volkswagen)', 'Tiida (Nissan)', 'Tipo (Fiat)', 'Titan (Nissan)', 'Tivoli (SsangYong)', 'Tivoli Grand (SsangYong)', 'Toledo (Seat)', 'Tonale (Alfa Romeo)', 'Toronado (Oldsmobile)', 'Touareg (Volkswagen)', 'Touran (Volkswagen)', 'Tourneo Connect (Ford)', 'Tourneo Courier (Ford)', 'Tourneo Custom (Ford)', 'Town & Country (Chrysler)', 'Town Car (Lincoln)', 'Townstar (Nissan)', 'Trafic (Renault)', 'Trailblazer (Chevrolet)', 'Trajet (Hyundai)', 'Trans Am (Pontiac)', 'Transit (Ford)', 'Transit Connect (Ford)', 'Transit Courier (Ford)', 'Transit Custom (Ford)', 'Transporter (Volkswagen)', 'Traveller (Peugeot)', 'Traverse (Chevrolet)', 'Trax (Chevrolet)', 'Trevis (Daihatsu)', 'Trezia (Subaru)', 'Tribeca (Subaru)', 'Tribute (Mazda)', 'Trooper (Isuzu)', 'Tucson (Hyundai)', 'Tundra (Toyota)', 'Twingo (Renault)', 'Twizy (Renault)', 'UX (Lexus)', 'Ulysse (Fiat)', 'Uno (Fiat)', 'Urban Cruiser (Toyota)', 'Urus (Lamborghini)', 'V40 (Volvo)', 'V50 (Volvo)', 'V60 (Volvo)', 'V70 (Volvo)', 'V8 (Audi)', 'V8 Vantage (Aston Martin)', 'V90 (Volvo)', 'Vandura (GMC)', 'Vaneo (Mercedes-Benz)', 'Vanquish (Aston Martin)', 'Vantage (Aston Martin)', 'Vectra (Opel)', 'Vel Satis (Renault)', 'Veloster (Hyundai)', 'Venga (Kia)', 'Vento (Volkswagen)', 'Venza (Toyota)', 'Veracruz (Hyundai)', 'Verso (Toyota)', 'Verso S (Toyota)', 'Viano (Mercedes-Benz)', 'Viper (Dodge)', 'Virgo (Microcar)', 'Vision (Chrysler)', 'Vitara (Suzuki)', 'Vito (Mercedes-Benz)', 'Vivaro (Opel)', 'Volt (Chevrolet)', 'Voyager (Chrysler)', 'Voyager (Lancia)', 'W123 (Mercedes-Benz)', 'W124 (1984-1993) (Mercedes-Benz)', 'W201 (190) (Mercedes-Benz)', 'WRX (Subaru)', 'Wagon R+ (Suzuki)', 'Wagoneer (Jeep)', 'Willys (Jeep)', 'Wind (Renault)', 'Wraith (Rolls-Royce)', 'Wrangler (Jeep)', 'X 1 (Fiat)', 'X-90 (Suzuki)', 'X-Too (Ligier)', 'X-Too Max (Ligier)', 'X-Too R (Ligier)', 'X-Too RS (Ligier)', 'X-Trail (Nissan)', 'X-Type (Jaguar)', 'X1 (BMW)', 'X2 (BMW)', 'X3 (BMW)', 'X3 M (BMW)', 'X4 (BMW)', 'X4 M (BMW)', 'X5 (BMW)', 'X5 M (BMW)', 'X6 (BMW)', 'X6 M (BMW)', 'X7 (BMW)', 'XB7 (BMW-ALPINA)', 'XC 40 (Volvo)', 'XC 60 (Volvo)', 'XC 70 (Volvo)', 'XC 90 (Volvo)', 'XCeed (Kia)', 'XD3 (BMW-ALPINA)', 'XE (Jaguar)', 'XF (Jaguar)', 'XG 30 (Hyundai)', 'XJ (Jaguar)', 'XJR (Jaguar)', 'XJS (Jaguar)', 'XK (Jaguar)', 'XK8 (Jaguar)', 'XL7 (Suzuki)', 'XLV (SsangYong)', 'XM (Citroën)', 'XT (Subaru)', 'XT4 (Cadillac)', 'XT5 (Cadillac)', 'XTS (Cadillac)', 'XV (Subaru)', 'Xantia (Citroën)', 'Xedos (Mazda)', 'Xenon (Tata)', 'Xsara (Citroën)', 'Xsara Picasso (Citroën)', 'Xterra (Nissan)', 'Y (Tesla)', 'Yaris (Toyota)', 'Yaris Cross (Toyota)', 'Yaris Verso (Toyota)', 'Yeti (Škoda)', 'Ypsilon (Lancia)', 'Yukon (GMC)', 'Z3 (BMW)', 'Z4 (BMW)', 'Z4 M (BMW)', 'ZDX (Acura)', 'ZT (MG)', 'ZX (Citroën)', 'Zafira (Opel)', 'Zoe (Renault)', 'altul (Gonow)', 'altul (McLaren)', 'bZ4X (Toyota)', 'e (Honda)', 'e-tron (Audi)', 'e-tron GT (Audi)', 'i-MiEV (Mitsubishi)', 'i10 (Hyundai)', 'i20 (Hyundai)', 'i3 (BMW)', 'i30 N (Hyundai)', 'i4 (BMW)', 'i40 (Hyundai)', 'i8 (BMW)', 'iOn (Peugeot)', 'iQ (Toyota)', 'iX (BMW)', 'iX3 (BMW)', 'ix20 (Hyundai)', 'ix35 (Hyundai)', 'ix55 (Hyundai)', 'up! (Volkswagen)'])
+no_crash = col2.selectbox("Bezwypadkowy:", ['Tak', 'Nie'])
+damaged = col3.selectbox("Uszkodzony:", ['Nie', 'Tak'])
+color = col1.selectbox("Kolor:", ['Beżowy', 'Biały', 'Bordowy', 'Brązowy', 'Czarny', 'Czerwony', 'Fioletowy', 'Inny kolor', 'Niebieski', 'Srebrny', 'Szary', 'Zielony', 'Złoty', 'Żółty'])
+country = col2.selectbox("Kraj pochodzenia:",  ['Polska', 'Austria', 'Belgia', 'Białoruś', 'Bułgaria', 'Chorwacja', 'Czechy', 'Dania', 'Estonia', 'Finlandia', 'Francja', 'Grecja', 'Hiszpania', 'Holandia', 'Inny', 'Irlandia', 'Islandia', 'Japonia', 'Kanada', 'Liechtenstein', 'Litwa', 'Luksemburg', 'Łotwa', 'Monako', 'Niemcy', 'Norwegia', 'Rosja', 'Rumunia', 'Stany Zjednoczone', 'Szwajcaria', 'Szwecja', 'Słowacja', 'Słowenia', 'Turcja', 'Ukraina', 'Wielka Brytania', 'Węgry', 'Włochy'])
 
 
 
 
         
-df_pred=pd.DataFrame([[fuel,power,transmission,mileage, age, brand, model, no_crash, color, colour_type, country, doors, seats, cylinder_capacity, condition, car_type, district, drive, registered, zawieszenie, startstop, ogrzewane_siedzenie_tylne, klimatyzacja_4strefowa, kamera_parkowania, ogrzewanie_postojowe, czujnik_martwego_pola, kamera_w_lusterku, przyciemniane_szyby, lane_assist, tempomat_adaptacyjny, wspomaganie_kierownicy, podgrzewana_przednia_szyba, ogranicznik_predkosci, tapicerka_skorzana, klimatyzacja_2strefowa, elektryczne_szyby_przednie, lusterka_boczne_elektryczne, system_nawigacji_sat, podgrzewane_lusterka_boczne, elektryczny_fotel_kierowcy, elektryczny_fotel_pasazera, podgrzewany_fotel_kierowcy]], 
-                     columns=['fuel','power','transmission', 'mileage', 'age', 'brand', 'model', 'no_crash', 'color', 'colour_type', 'country', 'doors', 'seats', 'cylinder_capacity', 'condition', 'car_type', 'district', 'drive', 'registered', 'Zawieszenie regulowane', 'System StartStop', 'Ogrzewane siedzenia tylne', 'Klimatyzacja automatyczna 4 lub wicej strefowa','Kamera parkowania tył', 'Ogrzewanie postojowe', 'Asystent (czujnik) martwego pola', 'Kamera w lusterku bocznym','Przyciemniane tylne szyby', 'Lane assist - kontrola zmiany pasa ruchu', 'Tempomat adaptacyjny ACC', 'Wspomaganie kierownicy','Podgrzewana przednia szyba', 'Ogranicznik prdkoci', 'Tapicerka skrzana', 'Klimatyzacja automatyczna dwustrefowa','Elektryczne szyby przednie', 'Lusterka boczne ustawiane elektrycznie', 'System nawigacji satelitarnej','Podgrzewane lusterka boczne', 'Elektrycznie ustawiany fotel kierowcy', 'Elektrycznie ustawiany fotel pasaera', 'Podgrzewany fotel kierowcy'])
-
-
-df_pred["doors"]=df_pred["doors"].astype("category")
-df_pred["seats"]=df_pred["seats"].astype("category")
-df_pred["cylinder_capacity"]=df_pred["cylinder_capacity"].astype("int64")
+df_pred=pd.DataFrame([[fuel,power,transmission,mileage, year, brand, model, no_crash,damaged, color, country ]], columns=['fuel','power','transmission', 'mileage', 'year', 'brand', 'model', 'no_crash','damaged', 'color', 'country'])
 df_pred["fuel"]=df_pred["fuel"].astype("category")
-df_pred["power"]=df_pred["power"].astype("int64" )
+df_pred["power"]=df_pred["power"].astype("int32" )
 df_pred["transmission"]=df_pred["transmission"].astype("category")
-df_pred["mileage"]=df_pred["mileage"].astype("int64")
-df_pred["age"]=df_pred["age"].astype("int64")
-df_pred["age"]=current_year-df_pred["age"]
+df_pred["mileage"]=df_pred["mileage"].astype("int32")
+df_pred["year"]=df_pred["year"].astype("int32")
 df_pred["brand"]=df_pred["brand"].astype("category")
 df_pred["model"]=df_pred["model"].astype("category")
 df_pred["no_crash"]=df_pred["no_crash"].astype("category")
+df_pred["damaged"]=df_pred["damaged"].astype("category")
 df_pred["color"]=df_pred["color"].astype("category")
 df_pred["country"]=df_pred["country"].astype("category")
-df_pred["colour_type"]=df_pred["colour_type"].astype("category")
-df_pred["condition"]=df_pred["condition"].astype("category")
-df_pred["car_type"]=df_pred["car_type"].astype("category")
-df_pred["district"]=df_pred["district"].astype("category")
-df_pred["drive"]=df_pred["drive"].astype("category")
-df_pred["registered"]=df_pred["registered"].astype("category")
-
-df_pred["Zawieszenie regulowane"]=df_pred["Zawieszenie regulowane"].astype("int64")
-df_pred["System StartStop"]=df_pred["System StartStop"].astype("int64")
-df_pred["Ogrzewane siedzenia tylne"]=df_pred["Ogrzewane siedzenia tylne"].astype("int64")
-df_pred["Klimatyzacja automatyczna 4 lub wicej strefowa"]=df_pred["Klimatyzacja automatyczna 4 lub wicej strefowa"].astype("int64")
-df_pred["Kamera parkowania tył"]=df_pred["Kamera parkowania tył"].astype("int64")
-df_pred["Ogrzewanie postojowe"]=df_pred["Ogrzewanie postojowe"].astype("int64")
-df_pred["Asystent (czujnik) martwego pola"]=df_pred["Asystent (czujnik) martwego pola"].astype("int64")
-df_pred["Kamera w lusterku bocznym"]=df_pred["Kamera w lusterku bocznym"].astype("int64")
-df_pred["Przyciemniane tylne szyby"]=df_pred["Przyciemniane tylne szyby"].astype("int64")
-df_pred["Lane assist - kontrola zmiany pasa ruchu"]=df_pred["Lane assist - kontrola zmiany pasa ruchu"].astype("int64")
-df_pred["Tempomat adaptacyjny ACC"]=df_pred["Tempomat adaptacyjny ACC"].astype("int64")
-df_pred["Wspomaganie kierownicy"]=df_pred["Wspomaganie kierownicy"].astype("int64")
-df_pred["Podgrzewana przednia szyba"]=df_pred["Podgrzewana przednia szyba"].astype("int64")
-df_pred["Ogranicznik prdkoci"]=df_pred["Ogranicznik prdkoci"].astype("int64")
-df_pred["Tapicerka skrzana"]=df_pred["Tapicerka skrzana"].astype("int64")
-df_pred["Klimatyzacja automatyczna dwustrefowa"]=df_pred["Klimatyzacja automatyczna dwustrefowa"].astype("int64")
-df_pred["Elektryczne szyby przednie"]=df_pred["Elektryczne szyby przednie"].astype("int64")
-df_pred["Lusterka boczne ustawiane elektrycznie"]=df_pred["Lusterka boczne ustawiane elektrycznie"].astype("int64")
-df_pred["System nawigacji satelitarnej"]=df_pred["System nawigacji satelitarnej"].astype("int64")
-df_pred["Podgrzewane lusterka boczne"]=df_pred["Podgrzewane lusterka boczne"].astype("int64")
-df_pred["Elektrycznie ustawiany fotel kierowcy"]=df_pred["Elektrycznie ustawiany fotel kierowcy"].astype("int64")
-df_pred["Elektrycznie ustawiany fotel pasaera"]=df_pred["Elektrycznie ustawiany fotel pasaera"].astype("int64")
-df_pred["Podgrzewany fotel kierowcy"]=df_pred["Podgrzewany fotel kierowcy"].astype("int64")
-
-
-
-
-
-
-def convert_df(df_pred):
-   return df_pred.to_csv().encode('utf-8')
-
-csv = convert_df(df_pred)
-
-st.download_button(
-   "Press to Download",
-   csv,
-   "file.csv",
-   "text/csv",
-   key='download-csv'
-)
 
 model_lgbm = joblib.load('lgbr_model.pkl')
 prediction = model_lgbm.predict(df_pred)
@@ -250,11 +47,3 @@ prediction = model_lgbm.predict(df_pred)
 if st.button('Wyceń'):
 
     st.write('Wycena:', prediction, unsafe_allow_html=False)
-    
-def download_model(model_lgbm):
-    output_model = pickle.dumps(model_lgbm)
-    href = f'<a href="data:file" download="myfile.pkl">Download Trained Model .pkl File</a>'
-    st.markdown(href, unsafe_allow_html=True)
-
-
-download_model(model_lgbm)

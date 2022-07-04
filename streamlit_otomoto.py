@@ -251,6 +251,8 @@ df_pred["colour_type"]=df_pred["colour_type"].astype("category")
 
 model_lgbm = joblib.load('lgbr_model.pkl')
 prediction = model_lgbm.predict(df_pred)
+prediction = prediction.astype("int32")
+prediction = ' '.join(str(e) for e in prediction) + " PLN"
 
 if st.button('Wyceń'):
 

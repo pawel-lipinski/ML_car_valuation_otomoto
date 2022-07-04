@@ -183,12 +183,12 @@ df_pred=pd.DataFrame([[fuel,power,transmission,mileage, age, brand, model, no_cr
 
 df_pred["doors"]=df_pred["doors"].astype("category")
 df_pred["seats"]=df_pred["seats"].astype("category")
-df_pred["cylinder_capacity"]=df_pred["cylinder_capacity"].astype("int32")
+df_pred["cylinder_capacity"]=df_pred["cylinder_capacity"].astype("int64")
 df_pred["fuel"]=df_pred["fuel"].astype("category")
-df_pred["power"]=df_pred["power"].astype("int32" )
+df_pred["power"]=df_pred["power"].astype("int64" )
 df_pred["transmission"]=df_pred["transmission"].astype("category")
-df_pred["mileage"]=df_pred["mileage"].astype("int32")
-df_pred["age"]=df_pred["age"].astype("int32")
+df_pred["mileage"]=df_pred["mileage"].astype("int64")
+df_pred["age"]=df_pred["age"].astype("int64")
 df_pred["age"]=current_year-df_pred["age"]
 df_pred["brand"]=df_pred["brand"].astype("category")
 df_pred["model"]=df_pred["model"].astype("category")
@@ -202,35 +202,33 @@ df_pred["district"]=df_pred["district"].astype("category")
 df_pred["drive"]=df_pred["drive"].astype("category")
 df_pred["registered"]=df_pred["registered"].astype("category")
 
-df_pred["Zawieszenie regulowane"]=df_pred["Zawieszenie regulowane"].astype("int32")
-df_pred["System StartStop"]=df_pred["System StartStop"].astype("int32")
-df_pred["Ogrzewane siedzenia tylne"]=df_pred["Ogrzewane siedzenia tylne"].astype("int32")
-df_pred["Klimatyzacja automatyczna 4 lub wicej strefowa"]=df_pred["Klimatyzacja automatyczna 4 lub wicej strefowa"].astype("int32")
-df_pred["Kamera parkowania tył"]=df_pred["Kamera parkowania tył"].astype("int32")
-df_pred["Ogrzewanie postojowe"]=df_pred["Ogrzewanie postojowe"].astype("int32")
-df_pred["Asystent (czujnik) martwego pola"]=df_pred["Asystent (czujnik) martwego pola"].astype("int32")
-df_pred["Kamera w lusterku bocznym"]=df_pred["Kamera w lusterku bocznym"].astype("int32")
-df_pred["Przyciemniane tylne szyby"]=df_pred["Przyciemniane tylne szyby"].astype("int32")
-df_pred["Lane assist - kontrola zmiany pasa ruchu"]=df_pred["Lane assist - kontrola zmiany pasa ruchu"].astype("int32")
-df_pred["Tempomat adaptacyjny ACC"]=df_pred["Tempomat adaptacyjny ACC"].astype("int32")
-df_pred["Wspomaganie kierownicy"]=df_pred["Wspomaganie kierownicy"].astype("int32")
-df_pred["Podgrzewana przednia szyba"]=df_pred["Podgrzewana przednia szyba"].astype("int32")
-df_pred["Ogranicznik prdkoci"]=df_pred["Ogranicznik prdkoci"].astype("int32")
-df_pred["Tapicerka skrzana"]=df_pred["Tapicerka skrzana"].astype("int32")
-df_pred["Klimatyzacja automatyczna dwustrefowa"]=df_pred["Klimatyzacja automatyczna dwustrefowa"].astype("int32")
-df_pred["Elektryczne szyby przednie"]=df_pred["Elektryczne szyby przednie"].astype("int32")
-df_pred["Lusterka boczne ustawiane elektrycznie"]=df_pred["Lusterka boczne ustawiane elektrycznie"].astype("int32")
-df_pred["System nawigacji satelitarnej"]=df_pred["System nawigacji satelitarnej"].astype("int32")
-df_pred["Podgrzewane lusterka boczne"]=df_pred["Podgrzewane lusterka boczne"].astype("int32")
-df_pred["Elektrycznie ustawiany fotel kierowcy"]=df_pred["Elektrycznie ustawiany fotel kierowcy"].astype("int32")
-df_pred["Elektrycznie ustawiany fotel pasaera"]=df_pred["Elektrycznie ustawiany fotel pasaera"].astype("int32")
-df_pred["Podgrzewany fotel kierowcy"]=df_pred["Podgrzewany fotel kierowcy"].astype("int32")
+df_pred["Zawieszenie regulowane"]=df_pred["Zawieszenie regulowane"].astype("int64")
+df_pred["System StartStop"]=df_pred["System StartStop"].astype("int64")
+df_pred["Ogrzewane siedzenia tylne"]=df_pred["Ogrzewane siedzenia tylne"].astype("int64")
+df_pred["Klimatyzacja automatyczna 4 lub wicej strefowa"]=df_pred["Klimatyzacja automatyczna 4 lub wicej strefowa"].astype("int64")
+df_pred["Kamera parkowania tył"]=df_pred["Kamera parkowania tył"].astype("int64")
+df_pred["Ogrzewanie postojowe"]=df_pred["Ogrzewanie postojowe"].astype("int64")
+df_pred["Asystent (czujnik) martwego pola"]=df_pred["Asystent (czujnik) martwego pola"].astype("int64")
+df_pred["Kamera w lusterku bocznym"]=df_pred["Kamera w lusterku bocznym"].astype("int64")
+df_pred["Przyciemniane tylne szyby"]=df_pred["Przyciemniane tylne szyby"].astype("int64")
+df_pred["Lane assist - kontrola zmiany pasa ruchu"]=df_pred["Lane assist - kontrola zmiany pasa ruchu"].astype("int64")
+df_pred["Tempomat adaptacyjny ACC"]=df_pred["Tempomat adaptacyjny ACC"].astype("int64")
+df_pred["Wspomaganie kierownicy"]=df_pred["Wspomaganie kierownicy"].astype("int64")
+df_pred["Podgrzewana przednia szyba"]=df_pred["Podgrzewana przednia szyba"].astype("int64")
+df_pred["Ogranicznik prdkoci"]=df_pred["Ogranicznik prdkoci"].astype("int64")
+df_pred["Tapicerka skrzana"]=df_pred["Tapicerka skrzana"].astype("int64")
+df_pred["Klimatyzacja automatyczna dwustrefowa"]=df_pred["Klimatyzacja automatyczna dwustrefowa"].astype("int64")
+df_pred["Elektryczne szyby przednie"]=df_pred["Elektryczne szyby przednie"].astype("int64")
+df_pred["Lusterka boczne ustawiane elektrycznie"]=df_pred["Lusterka boczne ustawiane elektrycznie"].astype("int64")
+df_pred["System nawigacji satelitarnej"]=df_pred["System nawigacji satelitarnej"].astype("int64")
+df_pred["Podgrzewane lusterka boczne"]=df_pred["Podgrzewane lusterka boczne"].astype("int64")
+df_pred["Elektrycznie ustawiany fotel kierowcy"]=df_pred["Elektrycznie ustawiany fotel kierowcy"].astype("int64")
+df_pred["Elektrycznie ustawiany fotel pasaera"]=df_pred["Elektrycznie ustawiany fotel pasaera"].astype("int64")
+df_pred["Podgrzewany fotel kierowcy"]=df_pred["Podgrzewany fotel kierowcy"].astype("int64")
 
 
 
 
-#if st.button('zapisz df'):
-#    df_pred.to_csv(index=False)
 
 
 def convert_df(df_pred):
@@ -253,3 +251,10 @@ if st.button('Wyceń'):
 
     st.write('Wycena:', prediction, unsafe_allow_html=False)
     
+def download_model(model_lgbm):
+    output_model = pickle.dumps(model_lgbm)
+    href = f'<a href="data:file" download="myfile.pkl">Download Trained Model .pkl File</a>'
+    st.markdown(href, unsafe_allow_html=True)
+
+
+download_model(model_lgbm)

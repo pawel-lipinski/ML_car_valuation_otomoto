@@ -86,9 +86,9 @@ Note: CUDA (GPU) is recommended for training but not required for inference.
 
 
 Performance Summary (Sample)
-| Segment | Price | Range | MAE (Error) | MAPE (%) | Verdict |
+| Segment | Price Range | MAE (Error) | MAPE (%) | Verdict |
 |---------|-------|-------|-------------|----------|---------|
-| Budget | < 30k PL N | ~3,300 PLN | ~25% | Volatile (Condition matters more than specs) |
+| Budget | < 30k PLN | ~3,300 PLN | ~25% | Volatile (Condition matters more than specs) |
 | Economy | 30k-70k PLN | ~5,100 PLN | ~10.7% |Reliable |
 | Mid-Range | 70k-150k PLN | ~8,600 PLN | ~8.3% | Highly Accurate |
 | Premium | 150k-300k PLN | ~16,200 PLN | ~7.9% | Excellent |

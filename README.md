@@ -85,14 +85,14 @@ pip install pandas numpy matplotlib seaborn scikit-learn xgboost catboost shap d
 Note: CUDA (GPU) is recommended for training but not required for inference.
 
 
-**Performance Summary (Sample)**
+**Performance Summary (Sample) - AutoGluon model**
 | Segment | Price Range | MAE (Error) | MAPE (%) | Verdict |
 |---------|--------------|-------------|----------|---------|
-| Budget | < 30k PLN | ~3,300 PLN | ~25% | Volatile (Condition matters more than specs) |
-| Economy | 30k-70k PLN | ~5,100 PLN | ~10.7% |Reliable |
-| Mid-Range | 70k-150k PLN | ~8,600 PLN | ~8.3% | Highly Accurate |
-| Premium | 150k-300k PLN | ~16,200 PLN | ~7.9% | Excellent |
-| Luxury | > 300k PLN | ~51,000 PLN | ~9.1% | Strong Trend Capture |
+| Budget | < 20k PLN | ~3,300 PLN | ~32% | Volatile (Condition matters more than specs) |
+| Economy | 20k-50k PLN | ~4,200 PLN | ~12.7% |Reliable |
+| Mid-Range | 50k-100k PLN | ~6,600 PLN | ~9.1% | Highly Accurate |
+| Premium | 100k-250k PLN | ~12,100 PLN | ~7.9% | Excellent |
+| Luxury | > 250k PLN | ~35,500 PLN | ~8.6% | Strong Trend Capture |
 
 Note: Metrics derived from the Holdout set (20% of data).
 

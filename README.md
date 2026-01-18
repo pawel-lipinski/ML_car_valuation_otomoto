@@ -67,17 +67,17 @@ Unlike simple regression models, this system uses **AutoGluon's "Best Quality" M
 
 
 
-Pipeline Workflow. 
-1. Data Ingestion \& CleaningThe notebook otomoto\_model\_training\_2026.ipynb loads raw data, parses numeric values, and handles missing data. It applies a Shielded Isolation Forest to remove corrupted records without losing high-value inventory.
-2. Training (AutoGluon Pro)We use the presets='best\_quality' configuration. This trains models in layers:
+**Pipeline Workflow.**
+1. **Data Ingestion \& Cleaning.** The notebook otomoto\_model\_training\_2026.ipynb loads raw data, parses numeric values, and handles missing data. It applies a Shielded Isolation Forest to remove corrupted records without losing high-value inventory.
+2. **Training (AutoGluon Pro).** We use the presets='best\_quality' configuration. This trains models in layers:
 Layer 1: CatBoost, XGBoost, Neural Net Torch, LightGBM.
 Layer 2: A meta-learner that combines the outputs of Layer 1 to correct their biases.
-3. Professional AuditThe pipeline includes a comprehensive auditing suite:
-- Segmented Performance Matrix: Evaluates MAE/MAPE across Budget, Economy, Mid-Range, Premium, and Luxury tiers.Residual Analysis: Visualizes heteroscedasticity.
+3. **Professional Audit.** The pipeline includes a comprehensive auditing suite:
+- Segmented Performance Matrix: Evaluates MAE/MAPE across Budget, Economy, Mid-Range, Premium, and Luxury tiers. Residual Analysis: Visualizes heteroscedasticity.
 - Brand Bias Scorecard: Identifies if the model systematically overprices or underprices specific brands (e.g., Dacia vs. Porsche).
 - The "Black Book": Automatically flags the top worst over-valuations and under-valuations for manual review.
 
-Installation \& Requirements
+**Installation \& Requirements**
 Ensure you have the necessary Python libraries installed:
 ```bash
 pip install pandas numpy matplotlib seaborn scikit-learn xgboost catboost shap deep-translator joblib autogluon
@@ -85,7 +85,7 @@ pip install pandas numpy matplotlib seaborn scikit-learn xgboost catboost shap d
 Note: CUDA (GPU) is recommended for training but not required for inference.
 
 
-Performance Summary (Sample)
+**Performance Summary (Sample)**
 | Segment | Price Range | MAE (Error) | MAPE (%) | Verdict |
 |---------|--------------|-------------|----------|---------|
 | Budget | < 30k PLN | ~3,300 PLN | ~25% | Volatile (Condition matters more than specs) |

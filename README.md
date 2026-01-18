@@ -7,7 +7,7 @@ This project is an end-to-end Machine Learning pipeline designed to predict used
 Unlike simple regression models, this system uses \*\*AutoGluon's "Best Quality" Multi-Layer Stacking\*\*, which ensembles Neural Networks, CatBoost, and LightGBM models to achieve state-of-the-art accuracy. It is specifically engineered to handle the complexities of the Polish market, including regional price differences, budget car anomalies, and luxury vehicle valuations.
 
 
-##Key Features
+## Key Features
 
 
 
@@ -39,29 +39,29 @@ Unlike simple regression models, this system uses \*\*AutoGluon's "Best Quality"
 
 ├── data/
 
-│   ├── raw\_data.csv                  # Raw scraping data (Input)
+│    ├── raw\_data.csv                  Raw scraping data (Input)
 
-│   ├── train.csv                     # Cleaned training dataset
+│    ├── train.csv                      Cleaned training dataset
 
-│   └── test.csv                      # Holdout dataset (20%)
-
-│
-
-├── saved\_models/                     # PRODUCTION ARTIFACTS (DEPLOY FROM HERE)
-
-│   ├── autogluon\_pro\_ensemble/       # The Champion Model (Contains model artifacts)
-
-│   └── feature\_columns.pkl           # Critical: List of column names/order required for prediction
+│    └── test.csv                       Holdout dataset (20%)
 
 │
 
-├── ag\_models\_benchmark/              # Temporary: Output from initial "Quick Shootout"
+├── saved\_models/                     PRODUCTION ARTIFACTS (DEPLOY FROM HERE)
 
-├── ag\_models\_pro/                    # Temporary: Working directory for heavy training
+│    ├── autogluon\_pro\_ensemble/     The Champion Model (Contains model artifacts)
+
+│    └── feature\_columns.pkl          Critical: List of column names/order required for prediction
 
 │
 
-└── otomoto\_model\_training\_2026.ipynb # Main Training \& Audit Pipeline
+├── ag\_models\_benchmark/             Temporary: Output from initial "Quick Shootout"
+
+├── ag\_models\_pro/                   Temporary: Working directory for heavy training
+
+│
+
+└── otomoto\_model\_training\_2026.ipynb Main Training \& Audit Pipeline
 
 
 
@@ -86,12 +86,13 @@ Note: CUDA (GPU) is recommended for training but not required for inference.
 
 
 Performance Summary (Sample)
-Segment | Price | Range | MAE (Error) | MAPE (%) | Verdict
-Budget | < 30k PL N | ~3,300 PLN | ~25% | Volatile (Condition matters more than specs)
-Economy | 30k-70k PLN | ~5,100 PLN | ~10.7% |Reliable
-Mid-Range | 70k-150k PLN | ~8,600 PLN | ~8.3% | Highly Accurate 
-Premium | 150k-300k PLN | ~16,200 PLN | ~7.9% | Excellent
-Luxury | > 300k PLN | ~51,000 PLN | ~9.1% | Strong Trend Capture
+| Segment | Price | Range | MAE (Error) | MAPE (%) | Verdict |
+|---------|-------|-------|-------------|----------|---------|
+| Budget | < 30k PL N | ~3,300 PLN | ~25% | Volatile (Condition matters more than specs) |
+| Economy | 30k-70k PLN | ~5,100 PLN | ~10.7% |Reliable |
+| Mid-Range | 70k-150k PLN | ~8,600 PLN | ~8.3% | Highly Accurate |
+| Premium | 150k-300k PLN | ~16,200 PLN | ~7.9% | Excellent |
+| Luxury | > 300k PLN | ~51,000 PLN | ~9.1% | Strong Trend Capture |
 
 Note: Metrics derived from the Holdout set (20% of data).
 

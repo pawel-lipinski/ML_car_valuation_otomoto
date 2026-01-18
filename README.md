@@ -4,7 +4,7 @@
 
 This project is an end-to-end Machine Learning pipeline designed to predict used car prices in the Polish market (Otomoto).
 
-Unlike simple regression models, this system uses \*\*AutoGluon's "Best Quality" Multi-Layer Stacking\*\*, which ensembles Neural Networks, CatBoost, and LightGBM models to achieve state-of-the-art accuracy. It is specifically engineered to handle the complexities of the Polish market, including regional price differences, budget car anomalies, and luxury vehicle valuations.
+Unlike simple regression models, this system uses **AutoGluon's "Best Quality" Multi-Layer Stacking**, which ensembles Neural Networks, CatBoost, and LightGBM models to achieve state-of-the-art accuracy. It is specifically engineered to handle the complexities of the Polish market, including regional price differences, budget car anomalies, and luxury vehicle valuations.
 
 
 ## Key Features

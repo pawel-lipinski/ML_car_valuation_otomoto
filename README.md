@@ -21,8 +21,6 @@ Unlike simple regression models, this system uses **AutoGluon's "Best Quality" M
 
 * **Automated Translation:** Translates categorical features (Color, Body Type, Transmission) from Polish to English using `deep\_translator`.
 
-* **Geo-Spatial Intelligence:** Calculates `dist\_to\_warsaw` (distance to capital) to account for regional purchasing power differences.
-
 * **Power-to-Weight Parsing:** Extracts numeric data from messy string fields (e.g., "150 KM", "2000 cm3").
 
 ### Robustness \& Safety

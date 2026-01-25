@@ -1,1 +1,1 @@
-Pro Model (MAE: 8548)
+Pro Model (MAE: 8442)

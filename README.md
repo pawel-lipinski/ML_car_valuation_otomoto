@@ -88,11 +88,11 @@ Note: CUDA (GPU) is recommended for training but not required for inference.
 **Performance Summary (Sample) - AutoGluon model**
 | Segment | Price Range | MAE (Error) | MAPE (%) | Verdict |
 |---------|--------------|-------------|----------|---------|
-| Budget | < 20k PLN | ~3,150 PLN | ~31.8% | Volatile (Condition matters more than specs) |
-| Economy | 20k-50k PLN | ~4,200 PLN | ~12.4% |Reliable |
-| Mid-Range | 50k-100k PLN | ~6,600 PLN | ~9.1% | Highly Accurate |
-| Premium | 100k-250k PLN | ~12,200 PLN | ~8.0 | Excellent |
-| Luxury | > 250k PLN | ~37,500 PLN | ~8.9% | Strong Trend Capture |
+| Budget | < 20k PLN | ~3,290 PLN | ~34.8% | Volatile (Condition matters more than specs) |
+| Economy | 20k-50k PLN | ~4,250 PLN | ~12.6% |Reliable |
+| Mid-Range | 50k-100k PLN | ~6,790 PLN | ~9.3% | Highly Accurate |
+| Premium | 100k-250k PLN | ~12,360 PLN | ~8.0 | Excellent |
+| Luxury | > 250k PLN | ~36,400 PLN | ~8.8% | Strong Trend Capture |
 
 Note: Metrics derived from the Holdout set (20% of data).
 

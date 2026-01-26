@@ -1,0 +1,27 @@
+# --- Core Data Science Stack ---
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib
+seaborn
+joblib
+tqdm
+
+# --- Machine Learning Models ---
+xgboost>=2.0.0
+lightgbm>=4.0.0
+catboost>=1.2.0
+interpret>=0.4.0         # For EBM (Explainable Boosting Machine)
+autogluon>=1.0.0         # For the Heavyweight Ensemble
+
+# --- Optimization & Explainability ---
+optuna>=3.0.0            # For LightGBM/XGBoost tuning
+shap>=0.42.0             # For SHAP values analysis
+
+# --- Utilities & Pre-processing ---
+scikit-learn>=1.3.0
+deep-translator>=1.11.0  # For Automatic Translation
+plotly>=5.15.0           # For the 3D Treasure Map
+
+# --- Notebook Environment (Rich Output) ---
+ipywidgets>=8.0.0        # Fixes TqdmWarning and enables interactive dashboards
+jinja2>=3.1.0            # Enables background_gradient in pandas tables

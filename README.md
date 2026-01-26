@@ -78,7 +78,7 @@ Layer 2: A meta-learner that combines the outputs of Layer 1 to correct their bi
 **Installation \& Requirements**
 Ensure you have the necessary Python libraries installed:
 ```bash
-pip install pandas numpy matplotlib seaborn scikit-learn xgboost catboost shap deep-translator joblib autogluon
+pip install -r requirements.txt
 ```
 Note: CUDA (GPU) is recommended for training but not required for inference.
 
